@@ -18,6 +18,9 @@ export class MessageController implements Controller {
         //#region 
         try {
             const messages = await Message.find();
+            if (!messages) {
+                res.status(404).json({ message: "Messages not found" });
+            }
             res.status(200).json({ success: true, data: messages });
         } catch (error) {
             next(error);
@@ -28,7 +31,10 @@ export class MessageController implements Controller {
         //#region 
         try {
             const { id } = req.params;
-            const message = await Message.findById(id);
+            const message = await Message.findById(id).populate('senderId').populate('chatId');
+            if (!message) {
+                res.status(404).json({ message: "Message not found" });
+            }
             res.status(200).json({ success: true, data: message });
         } catch (error) {
             next(error);
@@ -52,10 +58,7 @@ export class MessageController implements Controller {
     async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
         //#region 
         try {
-            let id = req.params.id;
-            if (!id) {
-                id = req.body.id;
-            }
+            const { id } = req.body;
             const idsToDelete = Array.isArray(id) ? id : [id];
             const deletedMessages = await Message.deleteMany({ _id: { $in: idsToDelete } });
             res.status(200).json({ success: true, data: deletedMessages });

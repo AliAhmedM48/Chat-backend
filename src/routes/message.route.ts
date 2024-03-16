@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { MessageController } from '../controllers/message.controller';
+import { validateId } from '../middlewares/validateId.middleware';
 
 
-class UserRoutes {
+class MessageRoutes {
     router = Router();
     controller = new MessageController();
     constructor() {
@@ -10,15 +11,16 @@ class UserRoutes {
     }
 
     intializeRoutes() {
-        this.router
-            .post('/messages', this.controller.create)
-            .get('/messages', this.controller.findAll)
-        this.router
-            .get('/messages/:id', this.controller.findOne)
-            .put('/messages/:id', this.controller.update)
-            .delete('/messages/:id', this.controller.delete)
-            .delete('/messages', this.controller.delete)
+        this.router.route('/')
+            .post(this.controller.create)
+            .get(this.controller.findAll)
+            .delete(this.controller.delete);
+
+        this.router.route('/:id')
+            .all(validateId)
+            .get(this.controller.findOne)
+            .put(this.controller.update);
     }
 }
 
-export default new UserRoutes().router;
+export default new MessageRoutes().router;

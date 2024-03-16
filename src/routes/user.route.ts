@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/user.controller';
+import { validateId } from '../middlewares/validateId.middleware';
 
 class UserRoutes {
     router = Router();
@@ -9,15 +10,20 @@ class UserRoutes {
     }
 
     intializeRoutes() {
-        this.router
-            .get('/users', this.controller.findAll)
-        this.router
-            .get('/users/:id', this.controller.findOne)
-            .put('/users/:id', this.controller.update)
-            .delete('/users/:id', this.controller.delete)
+        this.router.route('/')
+            .get(this.controller.findAll)
+            // ! during development
+            .post(this.controller.create);
+
+        this.router.route('/:id')
+            .all(validateId)
+            .get(this.controller.findOne)
+            .put(this.controller.update)
+            .delete(this.controller.delete);
+
         this.router
             .post('/auth/register', this.controller.create)
-            .post('/auth/login', this.controller.login)
+            .post('/auth/login', this.controller.login);
     }
 }
 
