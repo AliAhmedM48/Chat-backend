@@ -10,7 +10,7 @@ class AuthRoutes {
 
   intializeRoutes() {
     this.router
-      .post("/register", this.controller.create)
+      .post("/register", this.controller.register)
       .post("/login", this.controller.login);
   }
 }

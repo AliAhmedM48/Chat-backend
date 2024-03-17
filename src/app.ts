@@ -1,4 +1,10 @@
-import express, { Application, Request, Response } from "express";
+import express, {
+  Application,
+  ErrorRequestHandler,
+  NextFunction,
+  Request,
+  Response,
+} from "express";
 import dotenv from "dotenv";
 import userRoute from "./routes/user.route";
 import messageRoute from "./routes/message.route";
@@ -7,6 +13,7 @@ import { connectToMongoDB } from "./models";
 import morgan from "morgan";
 import cors from "cors";
 import authRoute from "./routes/auth.route";
+import errorHandler from "./middlewares/error.middleware";
 
 // * configures dotenv to work in the application
 dotenv.config();
@@ -32,5 +39,8 @@ app.use("/api/v1/users", userRoute);
 app.use("/api/v1/messages", messageRoute);
 app.use("/api/v1/chats", chatRoute);
 app.use("/api/v1/auth", authRoute);
+
+//Global error handling middleware for express
+app.use(errorHandler);
 
 export { app };

@@ -16,7 +16,7 @@ class ChatRoutes {
     this.router
       .route("/:id")
       .all(validateId)
-      .get(this.chatController.getChats)
+      .get(this.chatController.getAllChats)
       .put(this.chatController.updateChat)
       .delete(this.chatController.deleteChat);
   }

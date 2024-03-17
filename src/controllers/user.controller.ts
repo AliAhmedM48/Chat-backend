@@ -1,52 +1,34 @@
 import { User } from "../models/user.model";
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { Controller } from "../interfaces/controller.interface";
-import mongoose from "mongoose";
+import ApiError from "../utils/api.error";
+import asyncHandler from "express-async-handler";
 
 export class UserController {
-  async findAll(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    //#region
-    try {
+  getAllUsers = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const users = await User.find();
-      if (!users) {
-        res.status(404).json({ message: "Users not found" });
+      if (users.length === 0) {
+        return next(new ApiError("Users not found", 404));
       }
       res.status(200).json({ success: true, data: users });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
-  async findOne(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    //#region
+  );
 
-    try {
+  getOneUser = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { id } = req.params;
 
       const user = await User.findById(id);
       if (!user) {
-        res.status(404).json({ message: "User not found" });
+        return next(new ApiError("User not found", 404));
       }
       res.status(200).json({ success: true, data: user });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
-  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //#region
+  );
 
-    try {
+  updateUser = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { id } = req.params;
       const { firstName, lastName, email, password, avatar } = req.body;
       const hashedPassword = await bcrypt.hash(password, 7);
@@ -61,22 +43,21 @@ export class UserController {
         },
         { new: true }
       );
+      if (!user) {
+        return next(new ApiError("User not found", 404));
+      }
       res.status(200).json({ success: true, data: user });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
-  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //#region
+  );
 
-    try {
+  deleteUser = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { id } = req.params;
       const user = await User.findByIdAndDelete(id);
+      if (!user) {
+        return next(new ApiError("User not found", 404));
+      }
       res.status(200).json({ success: true, data: user });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
+  );
 }

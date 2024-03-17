@@ -12,15 +12,15 @@ class MessageRoutes {
   intializeRoutes() {
     this.router
       .route("/")
-      .post(this.controller.create)
+      .post(this.controller.createMessage)
 
-      .delete(this.controller.delete);
+      .delete(this.controller.deleteMessage);
 
     this.router
       .route("/:id")
       .all(validateId)
-      .get(this.controller.findAll)
-      .put(this.controller.update);
+      .get(this.controller.getAllMessages)
+      .put(this.controller.updateMessage);
   }
 }
 

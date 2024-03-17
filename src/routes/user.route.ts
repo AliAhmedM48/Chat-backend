@@ -10,14 +10,14 @@ class UserRoutes {
   }
 
   intializeRoutes() {
-    this.router.route("/").get(this.controller.findAll);
+    this.router.route("/").get(this.controller.getAllUsers);
 
     this.router
       .route("/:id")
       .all(validateId)
-      .get(this.controller.findOne)
-      .put(this.controller.update)
-      .delete(this.controller.delete);
+      .get(this.controller.getOneUser)
+      .put(this.controller.updateUser)
+      .delete(this.controller.deleteUser);
   }
 }
 

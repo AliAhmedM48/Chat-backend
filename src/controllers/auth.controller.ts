@@ -1,12 +1,14 @@
+import { Message } from "./../models/message.model";
 import { User } from "../models/user.model";
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import asyncHandler from "express-async-handler";
+import ApiError from "../utils/api.error";
 
 export class AuthController {
-  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //#region
-    try {
+  register = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { firstName, lastName, email, password, avatar } = req.body;
       const hashedPassword = await bcrypt.hash(password, 7);
       const user = await User.create({
@@ -17,15 +19,11 @@ export class AuthController {
         avatar,
       });
       res.status(201).json({ success: true, data: user });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
+  );
 
-  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //#region
-    try {
+  login = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { email, password } = req.body;
       const user = await User.findOne({ email });
 
@@ -35,10 +33,9 @@ export class AuthController {
       );
 
       if (!isMatch || !user) {
-        res
-          .status(401)
-          .json({ success: false, error: "Invalid password or email" });
-        return;
+        return next(new ApiError("Invalid password or email", 404));
+        // res.status(400).json({ Message: "Invalid password or email" });
+        // return;
       }
       const token = jwt.sign(
         { userId: user._id },
@@ -48,9 +45,6 @@ export class AuthController {
       user.isOnline = true;
       user.password = "";
       res.status(200).json({ success: true, data: user, token });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
+  );
 }

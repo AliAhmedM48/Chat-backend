@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { Message } from "../models/message.model";
 import { Chat } from "../models/chat.model";
+import asyncHandler from "express-async-handler";
+import ApiError from "../utils/api.error";
 
 export class MessageController {
-  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //#region
-    try {
+  createMessage = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { senderId, chatId, body, users, name } = req.body;
       let message;
       if (!chatId) {
@@ -25,38 +26,31 @@ export class MessageController {
         { new: true }
       );
 
+      if (!chat) {
+        return next(new ApiError("chat not found", 404));
+      }
+
       res
         .status(201)
         .json({ success: true, data: message, lastMessage: chat?.lastMessage });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
-  async findAll(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    //#region
-    try {
+  );
+
+  getAllMessages = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { id } = req.params;
 
       let messages = await Message.find({ chatId: id });
 
       if (messages.length === 0 || !messages) {
-        res.status(404).json({ message: "Messages not found" });
+        return next(new ApiError("Messages not found", 404));
       }
       res.status(200).json({ success: true, data: messages });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
+  );
 
-  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //#region
-    try {
+  updateMessage = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { id } = req.params;
       const { senderId, chatId, body } = req.body;
       const message = await Message.findByIdAndUpdate(
@@ -64,26 +58,26 @@ export class MessageController {
         { senderId, chatId, body },
         { new: true }
       );
+      if (!message) {
+        return next(new ApiError("message not found", 404));
+      }
       res.status(200).json({ success: true, data: message });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
+  );
 
   // ^ Delete messages by IDs
-  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //#region
-    try {
+  deleteMessage = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { id } = req.body;
       const idsToDelete = Array.isArray(id) ? id : [id];
       const deletedMessages = await Message.deleteMany({
         _id: { $in: idsToDelete },
       });
+
+      if (!deletedMessages) {
+        return next(new ApiError("messages not found", 404));
+      }
       res.status(200).json({ success: true, data: deletedMessages });
-    } catch (error) {
-      next(error);
     }
-    //#endregion
-  }
+  );
 }
