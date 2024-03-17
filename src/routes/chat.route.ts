@@ -11,13 +11,12 @@ class ChatRoutes {
   }
 
   intializeRoutes() {
-    this.router.route('/')
-      .get(this.chatController.getChats)
-      .post(this.chatController.createChat);
+    this.router.route("/").post(this.chatController.createChat);
 
-    this.router.route('/:id')
+    this.router
+      .route("/:id")
       .all(validateId)
-      .get(this.chatController.getOneChat)
+      .get(this.chatController.getChats)
       .put(this.chatController.updateChat)
       .delete(this.chatController.deleteChat);
   }

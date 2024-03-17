@@ -4,7 +4,7 @@ import { Schema, model, Types } from "mongoose";
 interface IChat {
   name: string;
   users: Array<Types.ObjectId>;
-  lastMessage: Types.ObjectId;
+  lastMessage: string;
 }
 const atLeastOneUserValidator = (value: Types.ObjectId[]) => {
   return value.length > 0;
@@ -19,11 +19,9 @@ const chatSchema = new Schema<IChat>(
       validate: [atLeastOneUserValidator, "At least one user is required"], // Use the custom validator
     },
     lastMessage: {
-      type: Schema.ObjectId,
-      ref: "Message",
+      type: String,
       // ! during development
       // required: [true, "Last Message is Required"],
-
     },
   },
   { timestamps: true }

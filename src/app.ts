@@ -1,11 +1,12 @@
 import express, { Application, Request, Response } from "express";
 import dotenv from "dotenv";
-import userRoute from './routes/user.route';
+import userRoute from "./routes/user.route";
 import messageRoute from "./routes/message.route";
 import chatRoute from "./routes/chat.route";
 import { connectToMongoDB } from "./models";
 import morgan from "morgan";
-import cors from 'cors';
+import cors from "cors";
+import authRoute from "./routes/auth.route";
 
 // * configures dotenv to work in the application
 dotenv.config();
@@ -15,7 +16,7 @@ const app: Application = express();
 
 // * Enable support for JSON data in the payload
 app.use(express.json());
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 // * By default, this will allow all origins, all methods, and all headers
 app.use(cors());
@@ -27,11 +28,9 @@ app.use(cors());
 // * connecting to Mongodb
 connectToMongoDB();
 
-app.use('/api/v1/users', userRoute);
-app.use('/api/v1/messages', messageRoute);
+app.use("/api/v1/users", userRoute);
+app.use("/api/v1/messages", messageRoute);
 app.use("/api/v1/chats", chatRoute);
+app.use("/api/v1/auth", authRoute);
 
-export {
-  app
-}
-
+export { app };
