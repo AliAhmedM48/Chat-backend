@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
+import { loginValidator, registerValidator } from "../validations/auth";
 
 class AuthRoutes {
   router = Router();
@@ -10,8 +11,8 @@ class AuthRoutes {
 
   intializeRoutes() {
     this.router
-      .post("/register", this.controller.register)
-      .post("/login", this.controller.login);
+      .post("/register", registerValidator, this.controller.register)
+      .post("/login", loginValidator, this.controller.login);
   }
 }
 

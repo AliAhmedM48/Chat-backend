@@ -13,8 +13,11 @@ class MessageRoutes {
     this.router
       .route("/")
       .post(this.controller.createMessage)
-
       .delete(this.controller.deleteMessage);
+
+    this.router
+      .route("/messagesInGroup")
+      .post(this.controller.createMessagesInGroup);
 
     this.router
       .route("/:id")

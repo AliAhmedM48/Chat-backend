@@ -7,32 +7,45 @@ import ApiError from "../utils/api.error";
 export class MessageController {
   createMessage = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const { senderId, chatId, body, users, name } = req.body;
-      let message;
-      if (!chatId) {
-        const newChat = await Chat.create({ users, name });
+      const { senderId, receiverId, body } = req.body;
+      let isChat;
+      let chat;
+      let chatId;
 
-        message = await Message.create({
-          senderId,
-          chatId: newChat._id,
-          body,
+      isChat = await Chat.find({
+        $and: [{ isGroup: false }, { users: { $all: [senderId, receiverId] } }],
+      });
+
+      if (isChat.length === 0) {
+        chat = await Chat.create({
+          name: "chat",
+          users: [senderId, receiverId],
+          isGroup: false,
         });
+
+        chatId = chat._id;
       } else {
-        message = await Message.create({ senderId, chatId, body });
-      }
-      const chat = await Chat.findByIdAndUpdate(
-        chatId,
-        { lastMessage: body },
-        { new: true }
-      );
-
-      if (!chat) {
-        return next(new ApiError("chat not found", 404));
+        chatId = isChat[0]._id;
       }
 
-      res
-        .status(201)
-        .json({ success: true, data: message, lastMessage: chat?.lastMessage });
+      const message = await Message.create({
+        senderId: senderId,
+        chatId: chatId,
+        body: body,
+      });
+      res.status(201).json({ success: true, data: message });
+    }
+  );
+
+  createMessagesInGroup = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      const { senderId, chatId, body } = req.body;
+      const message = await Message.create({
+        senderId: senderId,
+        chatId: chatId,
+        body: body,
+      });
+      res.status(201).json({ success: true, data: message });
     }
   );
 

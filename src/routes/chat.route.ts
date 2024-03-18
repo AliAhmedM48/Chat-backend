@@ -11,7 +11,7 @@ class ChatRoutes {
   }
 
   intializeRoutes() {
-    this.router.route("/").post(this.chatController.createChat);
+    this.router.route("/createGroup").post(this.chatController.createChat);
 
     this.router
       .route("/:id")

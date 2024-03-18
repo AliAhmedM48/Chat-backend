@@ -5,6 +5,7 @@ interface IChat {
   name: string;
   users: Array<Types.ObjectId>;
   lastMessage: string;
+  isGroup: boolean;
 }
 const atLeastOneUserValidator = (value: Types.ObjectId[]) => {
   return value.length > 0;
@@ -22,6 +23,11 @@ const chatSchema = new Schema<IChat>(
       type: String,
       // ! during development
       // required: [true, "Last Message is Required"],
+    },
+    isGroup: {
+      type: Boolean,
+      // required: [true, "isGroup is Required"],
+      default: false,
     },
   },
   { timestamps: true }
