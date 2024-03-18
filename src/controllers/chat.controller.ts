@@ -45,8 +45,15 @@ class ChatController implements IChatController {
 
   deleteChat = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { id } = req.params;
-      const chat = await Chat.findByIdAndDelete(id);
+      const { userId, chatId } = req.body;
+      // const { id } = req.params;
+      // const chat = await Chat.findByIdAndDelete(id);
+      const chat = await Chat.findByIdAndUpdate(chatId, {
+        $pull: { users: userId }
+      }, { new: true });
+      console.log('User removed from chat successfully.');
+
+
       if (!chat) {
         return next(new ApiError("chat not found", 404));
       }

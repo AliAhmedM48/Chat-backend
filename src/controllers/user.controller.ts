@@ -30,19 +30,26 @@ export class UserController {
   updateUser = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { id } = req.params;
+      console.log(id);
+
       const { firstName, lastName, email, password, avatar } = req.body;
-      const hashedPassword = await bcrypt.hash(password, 7);
+      let hashedPassword = null;
+      if (password)
+        hashedPassword = await bcrypt.hash(password, 7);
+
       const user = await User.findByIdAndUpdate(
         id,
         {
           firstName,
           lastName,
           email,
-          passwordHash: hashedPassword,
+          passwordHash: hashedPassword || password,
           avatar,
         },
         { new: true }
       );
+      console.log({ user });
+
       if (!user) {
         return next(new ApiError("User not found", 404));
       }

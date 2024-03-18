@@ -2,21 +2,16 @@ import { ErrorRequestHandler, Request, Response, NextFunction } from "express";
 import ApiError from "../utils/api.error";
 
 const errorHandler: ErrorRequestHandler = (
-  err: Error,
+  err: ApiError,
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  //this is initial values for this properties
-  let statusCode = 500;
-  let status = "error";
 
-  if (err instanceof ApiError) {
-    // If err is an instance of ApiError, use its properties
-    statusCode = err.statusCode;
-    status = err.status;
-  }
+  let statusCode = err.statusCode || 500;
+  let status = err.status || "error";
   res.status(statusCode).json({
+    status: status,
     error: err,
     message: err.message,
     stack: err.stack,
