@@ -1,6 +1,7 @@
 import { Router } from "express";
 import ChatController from "../controllers/chat";
 import { validateMongoID } from "../middlewares/validateMongoID";
+import { checkChatMembership } from "../middlewares/checkChatMembership";
 
 class ChatRoutes {
   router = Router();
@@ -19,7 +20,7 @@ class ChatRoutes {
       .route("/:id")
       .all(validateMongoID)
       // * load all chats by [user id]
-      .get(this.chatController.getAllChats)
+      .get(this.chatController.getByUserIdOrByChatId)
       // * middleware to check by [chat id , user id] if user is already in chat/group
       .put(this.chatController.updateChat)
       // * middleware to check by [chat id , user id] if user is already in chat/group

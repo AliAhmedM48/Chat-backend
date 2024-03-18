@@ -33,8 +33,6 @@ export class AuthController {
 
       if (!isMatch || !user) {
         return next(new NotFoundError("Invalid password or email"));
-        // res.status(400).json({ Message: "Invalid password or email" });
-        // return;
       }
       const token = jwt.sign(
         { userId: user._id },
