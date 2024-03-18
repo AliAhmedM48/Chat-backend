@@ -1,6 +1,6 @@
 import { check } from "express-validator";
 import validatorMiddleware from "../middlewares/validate";
-import { User } from "../models/user.model";
+import { User } from "../models/user";
 
 export const registerValidator = [
   check("firstName").notEmpty().withMessage("First Name is required"),

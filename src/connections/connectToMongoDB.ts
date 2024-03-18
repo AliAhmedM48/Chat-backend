@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
-const connectToMongoDB = async () => {
+const connectToMongoDB = async (db_url: string) => {
     //#region 
     try {
         mongoose
-            .connect(`${process.env.DB_HOST_MONGO}`, {
+            .connect(db_url, {
                 dbName: process.env.DB_NAME
             })
             .then(() => {

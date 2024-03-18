@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { Chat } from "../models/chat.model";
+import { Chat } from "../models/chat";
 import asyncHandler from "express-async-handler";
-import ApiError from "../utils/api.error";
+import { NotFoundError } from "../errors/notFoundError";
 
 interface IChatController {
   createChat(req: Request, res: Response, next: NextFunction): Promise<void>;
@@ -13,7 +13,9 @@ interface IChatController {
 class ChatController implements IChatController {
   createChat = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const chat = await Chat.create(req.body);
+      const { name, users, lastMessage, isGroup } = req.body;
+
+      const chat = await Chat.create({ name, users, lastMessage, isGroup });
       res.status(201).json({
         message: "create OK",
         chat,
@@ -37,7 +39,7 @@ class ChatController implements IChatController {
       const { id } = req.params;
       const chat = await Chat.findByIdAndUpdate(id, req.body, { new: true });
       if (!chat) {
-        return next(new ApiError("chat not found", 404));
+        return next(new NotFoundError("chat not found"));
       }
       res.status(200).send(chat);
     }
@@ -55,7 +57,7 @@ class ChatController implements IChatController {
 
 
       if (!chat) {
-        return next(new ApiError("chat not found", 404));
+        return next(new NotFoundError("chat not found"));
       }
       res.status(200).send(`this chat ${chat} has been deleted`);
     }

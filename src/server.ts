@@ -1,15 +1,15 @@
+// * Project dependencies
 import { app } from "./app";
-import dotenv from "dotenv";
-dotenv.config();
+
 const PORT = process.env.PORT;
 
+const initServer = async () => {
+    //#region 
+    app
+        .listen(PORT, () => { console.log("Server running at PORT: ", PORT) })
+        .on("error", (error) => { throw new Error(error.message) }); // * gracefully handle error
+    //#endregion
+}
 
-app
-    .listen(PORT, () => {
-        console.log("Server running at PORT: ", PORT);
-    })
-    .on("error", (error) => {
-        // gracefully handle error
-        throw new Error(error.message);
-    });
-
+// * Server initialization
+initServer();

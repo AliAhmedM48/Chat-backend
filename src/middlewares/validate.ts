@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
-import ApiError from "../utils/api.error";
 
 const validatorMiddleware = (
   req: Request,

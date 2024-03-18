@@ -1,10 +1,9 @@
-import { Message } from "./../models/message.model";
-import { User } from "../models/user.model";
+import { User } from "../models/user";
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
-import ApiError from "../utils/api.error";
+import { NotFoundError } from "../errors/notFoundError";
 
 export class AuthController {
   register = asyncHandler(
@@ -33,7 +32,7 @@ export class AuthController {
       );
 
       if (!isMatch || !user) {
-        return next(new ApiError("Invalid password or email", 404));
+        return next(new NotFoundError("Invalid password or email"));
         // res.status(400).json({ Message: "Invalid password or email" });
         // return;
       }

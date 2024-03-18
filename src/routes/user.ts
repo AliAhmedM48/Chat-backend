@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { UserController } from "../controllers/user.controller";
-import { validateId } from "../middlewares/validateId.middleware";
+import { UserController } from "../controllers/user";
+import { validateMongoID } from "../middlewares/validateMongoID";
+import { validateUpdateRequest } from "../validations/user";
 
 class UserRoutes {
   router = Router();
@@ -14,9 +15,9 @@ class UserRoutes {
 
     this.router
       .route("/:id")
-      .all(validateId)
+      .all(validateMongoID)
       .get(this.controller.getOneUser)
-      .put(this.controller.updateUser)
+      .put(validateUpdateRequest, this.controller.updateUser)
       .delete(this.controller.deleteUser);
   }
 }

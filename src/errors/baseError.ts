@@ -18,4 +18,14 @@ export class BaseError extends Error {
         Error.captureStackTrace(this);
 
     }
+
+    toObject(): Record<string, any> {
+        return {
+            name: this.name,
+            statusCode: this.statusCode,
+            isOperational: this.isOperational,
+            message: this.message,
+            stack: this.stack
+        }
+    }
 }

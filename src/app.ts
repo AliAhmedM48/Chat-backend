@@ -1,46 +1,51 @@
-import express, {
-  Application,
-  ErrorRequestHandler,
-  NextFunction,
-  Request,
-  Response,
-} from "express";
+// * Global dependencies
+//#region 
+import express, { Application, NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
-import userRoute from "./routes/user.route";
-import messageRoute from "./routes/message.route";
-import chatRoute from "./routes/chat.route";
-import { connectToMongoDB } from "./models";
-import morgan from "morgan";
 import cors from "cors";
-import authRoute from "./routes/auth.route";
-import errorHandler from "./middlewares/error.middleware";
+import morgan from "morgan";
+//#endregion
+
+// * Project dependencies
+//#region 
+import userRoute from "./routes/user";
+import messageRoute from "./routes/message";
+import chatRoute from "./routes/chat";
+import { connectToMongoDB } from "./connections/connectToMongoDB";
+import authRoute from "./routes/auth";
+import errorHandler from "./middlewares/errorHandler";
+import { NotFoundError } from "./errors/notFoundError";
+//#endregion
 
 // * configures dotenv to work in the application
 dotenv.config();
 
-// * Create Express Application
+// * Express initialization
 const app: Application = express();
 
-// * Enable support for JSON data in the payload
+// * Middlewares
 app.use(express.json());
 app.use(morgan("dev"));
-
-// * By default, this will allow all origins, all methods, and all headers
-app.use(cors());
+app.use(cors()); // By default, this will allow all origins, all methods, and all headers
 // Example configuration to allow only specific origins
 // app.use(cors({
 //   origin: 'http://example.com' // Allow requests from http://example.com
 // }));
 
-// * connecting to Mongodb
-connectToMongoDB();
+// * Routes
+const apiV1 = '/api/v1';
+app.use(apiV1 + "/users", userRoute);
+app.use(apiV1 + "/messages", messageRoute);
+app.use(apiV1 + "/chats", chatRoute);
+app.use(apiV1 + "/auth", authRoute);
+app.all('*', (req: Request, res: Response, next: NextFunction) => {
+    next(new NotFoundError('Not found page 404'));
+})
 
-app.use("/api/v1/users", userRoute);
-app.use("/api/v1/messages", messageRoute);
-app.use("/api/v1/chats", chatRoute);
-app.use("/api/v1/auth", authRoute);
-
-//Global error handling middleware for express
+// * Error handling
 app.use(errorHandler);
+
+// * connecting to Mongodb
+connectToMongoDB(`${process.env.DB_HOST_MONGO}`);
 
 export { app };
