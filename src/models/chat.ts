@@ -18,12 +18,11 @@ const chatSchema = new Schema<IChat>(
     // ! ++++++++++++++++++++++++++++
     name: {
       type: String,
-      default: "USE_RECEIVER_NAME"
+      default: "USE_RECEIVER_NAME",
       // required: [true, "Name is required"],
     },
     users: {
       type: [{ type: Schema.Types.ObjectId, ref: "User" }],
-      validate: [atLeastOneUserValidator, "At least one user is required"], // Use the custom validator
     },
     lastMessage: {
       type: String,
