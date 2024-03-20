@@ -11,8 +11,7 @@ const connectToMongoDB = async (db_url: string) => {
                 console.log("Connected to MongoDB", process.env.PORT);
             })
     } catch (error) {
-        console.log("connectDB function: ", error);
-
+        console.error('Error connecting to MongoDB:', error)
     }
     //#endregion
 }
