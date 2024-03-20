@@ -3,6 +3,8 @@ import { Message } from "../models/message";
 import { Chat } from "../models/chat";
 import asyncHandler from "express-async-handler";
 import { NotFoundError } from "../errors/notFoundError";
+import BadRequestError from "../errors/badRequestError";
+import { UnauthorizedError } from "../errors/unauthorizedError";
 
 export class MessageController {
   createMessage = asyncHandler(
@@ -10,43 +12,54 @@ export class MessageController {
       let { senderId, receiverId, body, chatId } = req.body;
 
       if (!(receiverId || chatId)) {
-        res.status(401).json({ message: "Send chatId or receiverId" });
-        return;
+        return next(new BadRequestError("send chatId or receiverId"));
       }
 
       // * CHECK Chat ID /////// check if chat id is provided
       if (!chatId) {
         // ! FIRST CASE /////// private chat /////// in case client start new chat from users list
-        //#region 
-        const existingChat = await Chat.findOne({ $and: [{ isGroup: false }, { users: { $all: [senderId, receiverId] } }] });
-        chatId = existingChat ? existingChat._id : (await Chat.create({ users: [senderId, receiverId] }))._id
+        //#region
+        const existingChat = await Chat.findOne({
+          $and: [
+            { isGroup: false },
+            { users: { $all: [senderId, receiverId] } },
+          ],
+        });
+        chatId = existingChat
+          ? existingChat._id
+          : (await Chat.create({ users: [senderId, receiverId] }))._id;
         //#endregion
       }
 
       // ! SECOND CASE /////// create group /////OR///// choose chat from chat list [chat / group]
       // ^ check by [chat id , user id] if user is [not] already in chat/group
-      const existingChat = await Chat.findOne({ _id: chatId, users: { $in: [senderId] } });
+      const existingChat = await Chat.findOne({
+        _id: chatId,
+        users: { $in: [senderId] },
+      });
       if (!existingChat) {
-        res.status(401).json({ message: "Unauthorized: You are not in the chat" });
-        return;
+        next(new UnauthorizedError("You are not in the chat"));
       }
 
       const message = await Message.create({ senderId, chatId, body });
-      res.status(201).json({ success: true, data: message });
+
+      const lastMessageUpdated = (
+        await Chat.findByIdAndUpdate(
+          {
+            _id: chatId,
+          },
+          { lastMessage: message.body },
+          { new: true }
+        )
+      )?.lastMessage;
+
+      console.log("message", lastMessageUpdated);
+
+      res
+        .status(201)
+        .json({ success: true, data: message, lastMessageUpdated });
     }
   );
-
-  // createMessagesInGroup = asyncHandler(
-  //   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  //     const { senderId, chatId, body } = req.body;
-  //     const message = await Message.create({
-  //       senderId: senderId,
-  //       chatId: chatId,
-  //       body: body,
-  //     });
-  //     res.status(201).json({ success: true, data: message });
-  //   }
-  // );
 
   getAllMessages = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {

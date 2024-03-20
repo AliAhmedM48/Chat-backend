@@ -1,5 +1,5 @@
 // * Global dependencies
-//#region 
+//#region
 import { join } from "node:path";
 
 import express, { Application, Request, Response, NextFunction } from "express";
@@ -9,7 +9,7 @@ import morgan from "morgan";
 //#endregion
 
 // * Project dependencies
-//#region 
+//#region
 import userRoute from "./routes/user";
 import messageRoute from "./routes/message";
 import chatRoute from "./routes/chat";
@@ -32,18 +32,21 @@ app.use(morgan("dev"));
 app.use(cors()); // By default, this will allow all origins, all methods, and all headers
 
 // * Routes
-const apiV1 = '/api/v1';
-app.use(apiV1 + "/users", userRoute);
-app.use(apiV1 + "/messages", messageRoute);
-app.use(apiV1 + "/chats", chatRoute);
-app.use(apiV1 + "/auth", authRoute);
+const apiV1 = express.Router();
+app.use("/api/v1", apiV1);
+
+apiV1.use("/users", userRoute);
+apiV1.use("/messages", messageRoute);
+apiV1.use("/chats", chatRoute);
+apiV1.use("/auth", authRoute);
 app.get('/io', (req, res) => {
     const filePath = join(__dirname, '..', 'public', 'index.html');
     res.sendFile(filePath);
 });
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
-    next(new NotFoundError('Not found page 404'));
-})
+
+apiV1.all("*", (req: Request, res: Response, next: NextFunction) => {
+    next(new NotFoundError("Invalid api"));
+});
 
 // * Error handling
 app.use(errorHandler);

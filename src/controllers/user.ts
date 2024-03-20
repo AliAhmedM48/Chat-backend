@@ -2,7 +2,7 @@ import { User } from "../models/user";
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import asyncHandler from "express-async-handler";
-import { ApiError } from "../errors/apiError";
+
 import { NotFoundError } from "../errors/notFoundError";
 
 export class UserController {
@@ -10,7 +10,7 @@ export class UserController {
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const users = await User.find();
       if (users.length === 0) {
-        return next(new NotFoundError('Users not found'));
+        return next(new NotFoundError("Users not found"));
       }
       res.status(200).json({ success: true, data: users });
     }
@@ -36,8 +36,7 @@ export class UserController {
       const { firstName, lastName, email, password, avatar } = req.body;
 
       let hashedPassword = null;
-      if (password)
-        hashedPassword = await bcrypt.hash(password, 7);
+      if (password) hashedPassword = await bcrypt.hash(password, 7);
 
       const user = await User.findByIdAndUpdate(
         id,
@@ -64,7 +63,7 @@ export class UserController {
       const { id } = req.params;
       const user = await User.findByIdAndDelete(id);
       if (!user) {
-        return next(new ApiError("User not found", 404));
+        return next(new NotFoundError("User not found"));
       }
       res.status(200).json({ success: true, data: user });
     }
