@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
+import { UnprocessableEntityError } from '../errors/unprocessableEntityError';
+import validatorMiddleware from './validate';
+import { check } from 'express-validator';
 
-export function validateMongoID(req: Request, res: Response, next: NextFunction): void {
-    const { id } = req.params;
+export const validateMongoID = [
+    check('id')
+        .optional().isMongoId().withMessage('Invalid mongo Id'),
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    check('chatId')
+        .optional().isMongoId().withMessage('Invalid mongo Id')
 
-        res.status(400).json({ message: 'Invalid ID' });
-        return;
-    }
-
-    next();
-}
+    ,
+    validatorMiddleware
+]

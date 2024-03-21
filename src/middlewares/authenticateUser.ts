@@ -1,16 +1,12 @@
-import jwt, { Secret } from "jsonwebtoken";
-import { NextFunction, Request, Response } from "express";
 import asyncHandler from "express-async-handler";
+import { NextFunction, Request, Response } from "express";
+import jwt, { Secret } from "jsonwebtoken";
+
 import { UnauthorizedError } from "../errors/unauthorizedError";
 import { User } from "../models/user";
-// * check user authentication
 
 interface JwtPayload {
   userId: string;
-}
-
-interface user {
-  user?: any;
 }
 
 export const checkUserAuthentication = asyncHandler(
@@ -35,10 +31,10 @@ export const checkUserAuthentication = asyncHandler(
       throw new Error("JWT_SECRET_KEY is not defined");
     }
     const secretKey: Secret = process.env.JWT_SECRET_KEY;
-    const decoded = jwt.verify(token, secretKey);
+    const decoded = jwt.verify(token, secretKey) as JwtPayload;
 
     // 3) Check if user exists
-    const currentUser = await User.findById((decoded as JwtPayload).userId);
+    const currentUser = await User.findById(decoded.userId);
     if (!currentUser) {
       return next(
         new UnauthorizedError(
@@ -47,7 +43,7 @@ export const checkUserAuthentication = asyncHandler(
       );
     }
 
-    (req as user).user = currentUser;
+    (req as any).loggedUser = currentUser;
     next();
   }
 );

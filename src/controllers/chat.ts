@@ -2,40 +2,43 @@ import { Request, Response, NextFunction } from "express";
 import { Chat } from "../models/chat";
 import asyncHandler from "express-async-handler";
 import { NotFoundError } from "../errors/notFoundError";
+import { HttpStatusCode } from "../errors/httpStatusCode";
+import BadRequestError from "../errors/badRequestError";
 
 interface IChatController {
-  createChat(req: Request, res: Response, next: NextFunction): Promise<void>;
-  getByUserIdOrByChatId(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void>;
+  createGroup(req: Request, res: Response, next: NextFunction): Promise<void>;
+  getByUserIdOrByChatId(req: Request, res: Response, next: NextFunction): Promise<void>;
   updateChat(req: Request, res: Response, next: NextFunction): Promise<void>;
   deleteChat(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
 
 class ChatController implements IChatController {
-  createChat = asyncHandler(
+
+  createGroup = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { name, users, lastMessage, isGroup } = req.body;
+      let { name, lastMessage } = req.body;
+      let users = (req as any).users; // from creation validation middleware
+      const chat = await Chat.create({ name, users, lastMessage, isGroup: true });
 
-      const chat = await Chat.create({ name, users, lastMessage, isGroup });
-
-      res.status(201).json({
-        message: "create OK",
-        chat,
-      });
+      res.status(HttpStatusCode.CREATED).json({ message: "create OK", chat });
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
   getByUserIdOrByChatId = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { id } = req.params;
+
+      let id = req.params.id;
+      if (!id) {
+        id = (req as any).loggedUser._id; // logged user   
+      }
+
       let chats = await Chat.find({ _id: id }).populate("users");
+
       if (chats.length === 0) {
         chats = await Chat.find({ users: id }).populate("users");
       }
-      res.status(200).send(chats);
+
+      res.status(HttpStatusCode.OK).json(chats);
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
@@ -46,7 +49,7 @@ class ChatController implements IChatController {
       if (!chat) {
         return next(new NotFoundError("chat not found"));
       }
-      res.status(200).send(chat);
+      res.status(HttpStatusCode.OK).send(chat);
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
@@ -55,12 +58,11 @@ class ChatController implements IChatController {
       const { userId, chatId } = req.body;
       // const { id } = req.params;
       // const chat = await Chat.findByIdAndDelete(id);
-      const chat = await Chat.findByIdAndUpdate(
+      const chat = await Chat.findByIdAndDelete(
         chatId,
         {
           $pull: { users: userId },
         },
-        { new: true }
       );
       console.log("User removed from chat successfully.");
 

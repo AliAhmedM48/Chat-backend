@@ -13,19 +13,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
-const user_1 = require("../models/user");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
-const apiError_1 = require("../errors/apiError");
+const user_1 = require("../models/user");
 const notFoundError_1 = require("../errors/notFoundError");
+const httpStatusCode_1 = require("../errors/httpStatusCode");
 class UserController {
     constructor() {
         this.getAllUsers = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const users = yield user_1.User.find();
-            if (users.length === 0) {
-                return next(new notFoundError_1.NotFoundError('Users not found'));
-            }
-            res.status(200).json({ success: true, data: users });
+            res.status(httpStatusCode_1.HttpStatusCode.OK).json({ success: true, data: users });
         }));
         this.getOneUser = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -33,35 +30,26 @@ class UserController {
             if (!user) {
                 return next(new notFoundError_1.NotFoundError("User not found"));
             }
-            res.status(200).json({ success: true, data: user });
+            res.status(httpStatusCode_1.HttpStatusCode.OK).json({ success: true, data: user });
         }));
         this.updateUser = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            console.log(id);
+            if (Object.keys(req.body).length === 0) {
+                res.status(httpStatusCode_1.HttpStatusCode.NOT_MODIFIED).end();
+                return;
+            }
+            const id = req.loggedUser._id; // logged user
             const { firstName, lastName, email, password, avatar } = req.body;
             let hashedPassword = null;
             if (password)
                 hashedPassword = yield bcryptjs_1.default.hash(password, 7);
-            const user = yield user_1.User.findByIdAndUpdate(id, {
-                firstName,
-                lastName,
-                email,
-                passwordHash: hashedPassword || password,
-                avatar,
-            }, { new: true });
-            console.log({ user });
-            if (!user) {
-                return next(new notFoundError_1.NotFoundError("User not found"));
-            }
-            res.status(200).json({ success: true, data: user });
+            // * Update logged user data
+            const user = yield user_1.User.findByIdAndUpdate(id, { firstName, lastName, email, avatar, passwordHash: hashedPassword || password }, { new: true });
+            res.status(httpStatusCode_1.HttpStatusCode.OK).json({ success: true, data: user });
         }));
         this.deleteUser = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
+            const id = req.loggedUser._id; // logged user
             const user = yield user_1.User.findByIdAndDelete(id);
-            if (!user) {
-                return next(new apiError_1.ApiError("User not found", 404));
-            }
-            res.status(200).json({ success: true, data: user });
+            res.status(httpStatusCode_1.HttpStatusCode.NO_CONTENT).json({ success: true, data: user });
         }));
     }
 }

@@ -10,6 +10,7 @@ const connectToSocket = (server: any) => {
     // * Apply authentication middleware to Socket.IO connection
     io.use(ioHandleAuthenticateSocket);
 
+
     io.on(socketEvents.connection, (socket) => {
 
         const clientId = socket.id;
@@ -24,6 +25,7 @@ const connectToSocket = (server: any) => {
         // * Error handling for Socket.IO events
         ioHandleError(socket);
     });
+
 }
 
 export { connectToSocket };

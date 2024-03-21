@@ -11,14 +11,24 @@ class UserRoutes {
   }
 
   intializeRoutes() {
-    this.router.route("/").get(this.controller.getAllUsers);
 
-    this.router
-      .route("/:id")
-      .all(validateMongoID)
-      .get(this.controller.getOneUser)
-      .put(validateUpdateRequest, this.controller.updateUser)
-      .delete(this.controller.deleteUser);
+    /**
+     * @swagger
+     * /api/v1/users:
+     *  get:
+     *    summary: Get all users
+     *    description: Retrieve a list of all users.
+     *  responses:
+     *    200:
+     *      description: A list of user.
+     */
+    this.router.route("/")
+      .get(this.controller.getAllUsers)
+      .delete(this.controller.deleteUser)
+      .put(this.controller.updateUser);
+
+    this.router.route("/:id")
+      .get(validateMongoID, this.controller.getOneUser);
   }
 }
 

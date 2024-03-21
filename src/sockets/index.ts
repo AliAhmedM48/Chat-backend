@@ -16,8 +16,10 @@ export const ioHandleNewMessage = (io: Server, socket: Socket, Message: Model<IM
     socket.on(socketEvents.new_message,
         asyncHandler(
             async (data) => {
+
                 const newMessage = await Message.create(data);
                 io.emit(socketEvents.new_message, data);
+
             }
         )
     );

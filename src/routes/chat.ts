@@ -1,8 +1,6 @@
-import { checkUserAuthentication } from "./../middlewares/authenticateUser";
 import { Router } from "express";
 import ChatController from "../controllers/chat";
 import { validateMongoID } from "../middlewares/validateMongoID";
-import { checkChatMembership } from "../middlewares/checkChatMembership";
 import { createChatValidations } from "../validations/chat";
 
 class ChatRoutes {
@@ -14,26 +12,21 @@ class ChatRoutes {
   }
 
   intializeRoutes() {
-    // * add avatar to chat model
-    // * add isGroup to chat model = default false
-    this.router
-      .route("/createGroup")
-      .post(
-        checkUserAuthentication,
-        createChatValidations,
-        this.chatController.createChat
-      );
 
-    this.router
-      .route("/:id")
-      .all(validateMongoID, checkUserAuthentication)
-      // * load all chats by [user id]
+    this.router.route("/")
       .get(this.chatController.getByUserIdOrByChatId)
-      // * middleware to check by [chat id , user id] if user is already in chat/group
+
+
+    this.router.route("/createGroup")
+      .post(createChatValidations, this.chatController.createGroup);
+
+    this.router.route("/:id")
+      .all(validateMongoID)
+      .get(this.chatController.getByUserIdOrByChatId)
+
       .put(this.chatController.updateChat)
-      // * middleware to check by [chat id , user id] if user is already in chat/group
-      // * remove user from group
       .delete(this.chatController.deleteChat);
+
   }
 }
 
