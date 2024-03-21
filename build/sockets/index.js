@@ -23,9 +23,14 @@ exports.socketEvents = {
 };
 const ioHandleNewMessage = (io, socket, Message) => {
     //#region 
-    socket.on(exports.socketEvents.new_message, (0, express_async_handler_1.default)((data) => __awaiter(void 0, void 0, void 0, function* () {
-        const newMessage = yield Message.create(data);
-        io.emit(exports.socketEvents.new_message, data);
+    socket.on(exports.socketEvents.new_message, (0, express_async_handler_1.default)((msg) => __awaiter(void 0, void 0, void 0, function* () {
+        // const newMessage = await Message.create(data);
+        if (msg.sender === 'me') {
+            // Handle messages sent by the client with sender 'me'
+            // For example, broadcast to all clients except the sender
+            socket.broadcast.emit(exports.socketEvents.new_message, msg);
+        }
+        // io.emit(socketEvents.new_message, msg);
     })));
     //#endregion
 };

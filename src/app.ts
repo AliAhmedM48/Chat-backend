@@ -51,6 +51,7 @@ app.get('/io', (req, res) => {
     res.sendFile(filePath);
 });
 
+
 apiV1.all("*", checkUserAuthentication, (req: Request, res: Response, next: NextFunction) => {
     next(new NotFoundError("Invalid api"));
 });

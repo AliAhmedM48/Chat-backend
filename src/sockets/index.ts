@@ -15,10 +15,15 @@ export const ioHandleNewMessage = (io: Server, socket: Socket, Message: Model<IM
     //#region 
     socket.on(socketEvents.new_message,
         asyncHandler(
-            async (data) => {
+            async (msg: any) => {
 
-                const newMessage = await Message.create(data);
-                io.emit(socketEvents.new_message, data);
+                // const newMessage = await Message.create(data);
+                if (msg.sender === 'me') {
+                    // Handle messages sent by the client with sender 'me'
+                    // For example, broadcast to all clients except the sender
+                    socket.broadcast.emit(socketEvents.new_message, msg);
+                }
+                // io.emit(socketEvents.new_message, msg);
 
             }
         )
