@@ -4,6 +4,7 @@ import asyncHandler from "express-async-handler";
 import HttpStatusCode from "../errors/httpStatusCode";
 import NotFoundError from "../errors/notFoundError";
 import ChatService from "../services/chat";
+import { pusher } from "../app";
 
 // interface IChatController {
 //   createGroup(req: Request, res: Response, next: NextFunction): Promise<void>;
@@ -21,6 +22,12 @@ export default class ChatController {
       let users = (req as any).users; // from creation validation middleware
 
       const chat = await this.service.createGroup(users, name, lastMessage);
+
+      chat.users.forEach((user) => {
+        if (user._id) {
+          pusher.trigger(user._id.toString(), "conversation:new", chat);
+        }
+      });
       res.status(HttpStatusCode.CREATED).json({ message: "create OK", chat });
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
