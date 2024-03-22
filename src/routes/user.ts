@@ -1,17 +1,15 @@
-import { Router } from "express";
-import { UserController } from "../controllers/user";
-import { validateMongoID } from "../middlewares/validateMongoID";
-import { validateUpdateRequest } from "../validations/user";
+import UserController from "../controllers/user";
+import validateMongoID from "../middlewares/validateMongoID";
 
-class UserRoutes {
-  router = Router();
-  controller = new UserController();
-  constructor() {
+import { Router } from "express";
+
+export default class UserRoutes {
+  public expressrRouter = Router();
+  constructor(private controller: UserController) {
     this.intializeRoutes();
   }
 
-  intializeRoutes() {
-
+  private intializeRoutes() {
     /**
      * @swagger
      * /api/v1/users:
@@ -22,14 +20,14 @@ class UserRoutes {
      *    200:
      *      description: A list of user.
      */
-    this.router.route("/")
+    this.expressrRouter.route("/")
       .get(this.controller.getAllUsers)
       .delete(this.controller.deleteUser)
       .put(this.controller.updateUser);
 
-    this.router.route("/:id")
+    this.expressrRouter.route("/:id")
       .get(validateMongoID, this.controller.getOneUser);
   }
+
 }
 
-export default new UserRoutes().router;

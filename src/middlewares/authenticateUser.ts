@@ -2,14 +2,14 @@ import asyncHandler from "express-async-handler";
 import { NextFunction, Request, Response } from "express";
 import jwt, { Secret } from "jsonwebtoken";
 
-import { UnauthorizedError } from "../errors/unauthorizedError";
-import { User } from "../models/user";
+import User from "../models/user";
+import UnauthorizedError from "../errors/unauthorizedError";
 
 interface JwtPayload {
   userId: string;
 }
 
-export const checkUserAuthentication = asyncHandler(
+const checkUserAuthentication = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     // 1) check if token exist
     let token;
@@ -18,13 +18,7 @@ export const checkUserAuthentication = asyncHandler(
       token = req.headers.authorization.split(" ")[1];
     }
 
-    if (!token) {
-      return next(
-        new UnauthorizedError(
-          "you are not login please login to access this route"
-        )
-      );
-    }
+    if (!token) { return next(new UnauthorizedError("you are not login please login to access this route")); }
 
     //2) verify token (no changes happens, expired token)
     if (!process.env.JWT_SECRET_KEY) {
@@ -47,3 +41,5 @@ export const checkUserAuthentication = asyncHandler(
     next();
   }
 );
+
+export default checkUserAuthentication;

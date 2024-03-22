@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from "express";
 import validatorMiddleware from "../middlewares/validate";
 import BadRequestError from "../errors/badRequestError";
 
-export const validateUpdateRequest = [
+import { Request, Response, NextFunction } from "express";
+
+const validateUpdateRequest = [
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const { firstName, lastName, email, password, avatar } = req.body;
 
@@ -26,3 +27,5 @@ export const validateUpdateRequest = [
     },
     validatorMiddleware
 ];
+
+export default validateUpdateRequest;

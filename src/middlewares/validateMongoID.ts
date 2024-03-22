@@ -1,10 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
-import { UnprocessableEntityError } from '../errors/unprocessableEntityError';
-import validatorMiddleware from './validate';
 import { check } from 'express-validator';
 
-export const validateMongoID = [
+import validatorMiddleware from './validate';
+
+const validateMongoID = [
     check('id')
         .optional().isMongoId().withMessage('Invalid mongo Id'),
 
@@ -13,4 +11,6 @@ export const validateMongoID = [
 
     ,
     validatorMiddleware
-]
+];
+
+export default validateMongoID;
