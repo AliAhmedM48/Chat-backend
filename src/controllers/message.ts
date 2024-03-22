@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
 
 import BadRequestError from "../errors/badRequestError";
-import Chat from "../models/chat";
 import Message from "../models/message";
 import HttpStatusCode from "../errors/httpStatusCode";
 import UnauthorizedError from "../errors/unauthorizedError";
