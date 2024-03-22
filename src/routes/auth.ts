@@ -1,19 +1,22 @@
 import { Router } from "express";
-import { AuthController } from "../controllers/auth";
 import { loginValidator, registerValidator } from "../validations/auth";
+<<<<<<< Updated upstream
+=======
+import AuthController from "../controllers/auth";
+import checkUserAuthentication from "../middlewares/authenticateUser";
+>>>>>>> Stashed changes
 
-class AuthRoutes {
-  router = Router();
-  controller = new AuthController();
-  constructor() {
+export default class AuthRoutes {
+  expressrRouter = Router();
+
+  constructor(private controller: AuthController) {
     this.intializeRoutes();
   }
 
-  intializeRoutes() {
-    this.router
+  private intializeRoutes() {
+    this.expressrRouter
       .post("/register", registerValidator, this.controller.register)
       .post("/login", loginValidator, this.controller.login);
   }
 }
 
-export default new AuthRoutes().router;

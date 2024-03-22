@@ -1,16 +1,23 @@
+<<<<<<< Updated upstream
 import { Router } from "express";
 import { MessageController } from "../controllers/message";
 import { validateMongoID } from "../middlewares/validateMongoID";
+=======
+import MessageController from "../controllers/message";
+import createMessageValidations from "../validations/message";
+import validateMongoID from "../middlewares/validateMongoID";
+>>>>>>> Stashed changes
 
-class MessageRoutes {
-  router = Router();
-  controller = new MessageController();
-  constructor() {
+import { Router } from "express";
+
+export default class MessageRoutes {
+  expressrRouter = Router();
+  constructor(private controller: MessageController) {
     this.intializeRoutes();
   }
 
-  intializeRoutes() {
-    this.router
+  private intializeRoutes() {
+    this.expressrRouter
       .route("/")
       // * middleware to check by [chat id , user id] if user is already in chat/group
       .post(this.controller.createMessage)
@@ -18,11 +25,18 @@ class MessageRoutes {
       // * and user is the owner of this message
       .delete(this.controller.deleteMessage);
 
+<<<<<<< Updated upstream
     // this.router
     // .route("/messagesInGroup")
     // .post(this.controller.createMessagesInGroup);
+=======
+    this.expressrRouter
+      .route("/:chatId")
+      .all(validateMongoID)
+      .get(this.controller.getAllMessages);
+>>>>>>> Stashed changes
 
-    this.router
+    this.expressrRouter
       .route("/:id")
       .all(validateMongoID)
       // * middleware to check by [chat id , user id] if user is already in chat/group
@@ -34,4 +48,3 @@ class MessageRoutes {
   }
 }
 
-export default new MessageRoutes().router;

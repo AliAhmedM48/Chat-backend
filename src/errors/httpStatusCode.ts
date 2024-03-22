@@ -1,4 +1,4 @@
-export enum HttpStatusCode {
+enum HttpStatusCode {
 
     // * Success
     OK = 200,
@@ -14,3 +14,5 @@ export enum HttpStatusCode {
     INTERNAL_SERVER = 500,
 
 }
+
+export default HttpStatusCode;

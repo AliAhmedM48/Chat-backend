@@ -1,6 +1,6 @@
-import { HttpStatusCode } from "./httpStatusCode";
+import HttpStatusCode from "./httpStatusCode";
 
-export class BaseError extends Error {
+export default class BaseError extends Error {
 
     constructor(
         public readonly name: string,
@@ -21,6 +21,7 @@ export class BaseError extends Error {
 
     toObject(): Record<string, any> {
         return {
+            success: false,
             name: this.name,
             statusCode: this.statusCode,
             isOperational: this.isOperational,
