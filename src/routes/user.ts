@@ -3,31 +3,28 @@ import validateMongoID from "../middlewares/validateMongoID";
 
 import { Router } from "express";
 
-export default class UserRoutes {
-  public expressrRouter = Router();
-  constructor(private controller: UserController) {
-    this.intializeRoutes();
-  }
 
-  private intializeRoutes() {
-    /**
-     * @swagger
-     * /api/v1/users:
-     *  get:
-     *    summary: Get all users
-     *    description: Retrieve a list of all users.
-     *  responses:
-     *    200:
-     *      description: A list of user.
-     */
-    this.expressrRouter.route("/")
-      .get(this.controller.getAllUsers)
-      .delete(this.controller.deleteUser)
-      .put(this.controller.updateUser);
+const userRoutes = (controller: UserController) => {
+  const router = Router();
+  /**
+      * @swagger
+      * /api/v1/users:
+      *  get:
+      *    summary: Get all users
+      *    description: Retrieve a list of all users.
+      *  responses:
+      *    200:
+      *      description: A list of user.
+      */
+  router.route("/")
+    .get(controller.getAllUsers)
+    .delete(controller.deleteUser)
+    .put(controller.updateUser);
 
-    this.expressrRouter.route("/:id")
-      .get(validateMongoID, this.controller.getOneUser);
-  }
+  router.route("/:id")
+    .get(validateMongoID, controller.getOneUser);
 
+  return router;
 }
 
+export default userRoutes

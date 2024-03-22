@@ -4,29 +4,23 @@ import createChatValidations from "../validations/chat";
 
 import { Router } from "express";
 
-// export default class  ChatRoutes {
-class ChatRoutes {
-  expressrRouter = Router();
-  constructor(private controller: ChatController) {
-    this.intializeRoutes();
-  }
+const chatRoutes = (controller: ChatController) => {
+  const router = Router();
 
-  private intializeRoutes() {
+  router.route("/")
+    .get(controller.getByUserIdOrByChatId)
 
-    this.expressrRouter.route("/")
-      .get(this.controller.getByUserIdOrByChatId)
+  router.route("/createGroup")
+    .post(createChatValidations, controller.createGroup);
 
-    this.expressrRouter.route("/createGroup")
-      .post(createChatValidations, this.controller.createGroup);
+  router.route("/:id")
+    .all(validateMongoID)
+    .get(controller.getByUserIdOrByChatId)
 
-    this.expressrRouter.route("/:id")
-      .all(validateMongoID)
-      .get(this.controller.getByUserIdOrByChatId)
+    .put(controller.updateChat)
+    .delete(controller.leaveChat);
 
-      .put(this.controller.updateChat)
-      .delete(this.controller.deleteChat);
-
-  }
+  return router;
 }
 
-export default ChatRoutes;
+export default chatRoutes;

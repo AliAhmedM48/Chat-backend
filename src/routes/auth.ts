@@ -3,18 +3,15 @@ import { loginValidator, registerValidator } from "../validations/auth";
 import AuthController from "../controllers/auth";
 import checkUserAuthentication from "../middlewares/authenticateUser";
 
-export default class AuthRoutes {
-  expressrRouter = Router();
+const authRoutes = (controller: AuthController) => {
+  const router = Router();
 
-  constructor(private controller: AuthController) {
-    this.intializeRoutes();
-  }
+  router
+    .post("/register", registerValidator, controller.register)
+    .post("/login", loginValidator, controller.login)
+    .put("/logout", checkUserAuthentication, controller.logout);
 
-  private intializeRoutes() {
-    this.expressrRouter
-      .post("/register", registerValidator, this.controller.register)
-      .post("/login", loginValidator, this.controller.login)
-      .put("/logout", checkUserAuthentication, this.controller.logout);
-  }
+  return router;
 }
 
+export default authRoutes

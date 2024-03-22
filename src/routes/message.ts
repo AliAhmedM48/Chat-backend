@@ -4,27 +4,25 @@ import validateMongoID from "../middlewares/validateMongoID";
 
 import { Router } from "express";
 
-export default class MessageRoutes {
-  expressrRouter = Router();
-  constructor(private controller: MessageController) {
-    this.intializeRoutes();
-  }
+const messageRoutes = (controller: MessageController) => {
+  const router = Router();
 
-  private intializeRoutes() {
-    this.expressrRouter
-      .route("/")
-      .post(createMessageValidations, this.controller.createMessage)
-      .delete(this.controller.deleteMessage); // two cases, mutiple messages or one, [body.id]
+  router
+    .route("/")
+    .post(createMessageValidations, controller.createMessage)
+    .delete(controller.deleteMessage); // two cases, mutiple messages or one, [body.id]
 
-    this.expressrRouter
-      .route("/:chatId")
-      .all(validateMongoID)
-      .get(this.controller.getAllMessages);
+  router
+    .route("/:chatId")
+    .all(validateMongoID)
+    .get(controller.getAllMessages);
 
-    this.expressrRouter
-      .route("/:id")
-      .all(validateMongoID)
-      .put(this.controller.updateMessage);
-  }
+  router
+    .route("/:id")
+    .all(validateMongoID)
+    .put(controller.updateMessage);
+
+  return router;
 }
 
+export default messageRoutes;
