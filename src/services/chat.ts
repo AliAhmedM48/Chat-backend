@@ -46,7 +46,6 @@ export default class ChatService {
     return await this.repository.update(chatId, update);
   }
 
-
   leaveChat = async (loggedUser_id: string, chatId: string) => {
     return await this.repository.deleteUser(loggedUser_id, chatId);
   }

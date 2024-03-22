@@ -1,19 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
 
-import Chat from "../models/chat";
 import HttpStatusCode from "../errors/httpStatusCode";
 import NotFoundError from "../errors/notFoundError";
 import ChatService from "../services/chat";
 
-interface IChatController {
-  createGroup(req: Request, res: Response, next: NextFunction): Promise<void>;
-  getByUserIdOrByChatId(req: Request, res: Response, next: NextFunction): Promise<void>;
-  updateChat(req: Request, res: Response, next: NextFunction): Promise<void>;
-  deleteChat(req: Request, res: Response, next: NextFunction): Promise<void>;
-}
+// interface IChatController {
+//   createGroup(req: Request, res: Response, next: NextFunction): Promise<void>;
+//   getByUserIdOrByChatId(req: Request, res: Response, next: NextFunction): Promise<void>;
+//   updateChat(req: Request, res: Response, next: NextFunction): Promise<void>;
+//   deleteChat(req: Request, res: Response, next: NextFunction): Promise<void>;
+// }
 
-export default class ChatController implements IChatController {
+export default class ChatController {
 
   constructor(private service: ChatService) { }
 
@@ -54,23 +53,12 @@ export default class ChatController implements IChatController {
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
   // !!!!!!!!!!!!!!!
-  deleteChat = asyncHandler(
+  leaveChat = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { userId, chatId } = req.body;
-      // const { id } = req.params;
-      // const chat = await Chat.findByIdAndDelete(id);
-      const chat = await Chat.findByIdAndUpdate(
-        chatId,
-        {
-          $pull: { users: userId },
-        },
-      );
-      console.log("User removed from chat successfully.");
-
-      if (!chat) {
-        return next(new NotFoundError("chat not found"));
-      }
-      res.status(200).send(`this chat ${chat} has been deleted`);
+      const { chatId } = req.body;
+      const id = (req as any).loggedUser._id; // logged user
+      await this.service.leaveChat(id, chatId);
+      res.status(HttpStatusCode.NO_CONTENT).end();
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
 }

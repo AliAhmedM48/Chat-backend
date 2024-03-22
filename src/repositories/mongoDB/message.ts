@@ -11,42 +11,24 @@ export default class MessageMongoRepository {
     return await Message.create({ senderId, chatId, body, seenIds, image });
   }
 
-
   findAllByChatId = async (chatId: string) => {
     return await Message.find({ chatId: chatId });
   }
+
   updateSeenIds = async (message: any, loggedUser_id: any) => {
-    // Add the logged in user's ID to the seenIds array if not already present
     message.seenIds.push(loggedUser_id);
-    // Save the updated message to the database
-  }
-  saveChanges = async (message: any) => {
-
-    await message.save();
+    message.save();
   }
 
+  update = async (messageId: string, loggedUser_id: string, update: { body?: string, image?: string }) => {
+    return await Message.findOneAndUpdate({ _id: messageId, senderId: loggedUser_id }, update, { new: true });
+  }
 
-  // update = async (id: string, seenIds: [string], image: string, senderId: string, chatId: string, body: string) => {
-  //   return await Message.findByIdAndUpdate(
-  //     id, { senderId, chatId, body, image, seenIds },
-  //     { new: true }
-  //   );
-  // }
+  deleteMany = async (messageIds: string[], loggedUser_id: string) => {
+    return await Message.deleteMany({ _id: { $in: messageIds }, senderId: loggedUser_id })
+  }
 
-  // ^ Delete messages by IDs
-  deleteMessage = asyncHandler(
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const { id } = req.body;
-      const idsToDelete = Array.isArray(id) ? id : [id];
-      const deletedMessages = await Message.deleteMany({
-        // ! CHECK user id
-        _id: { $in: idsToDelete },
-      });
-
-      if (deletedMessages.deletedCount === 0) {
-        return next(new NotFoundError("Messages not found"));
-      }
-      res.status(HttpStatusCode.OK).json({ success: true, data: deletedMessages });
-    }
-  );
+  deleteOne = async (messageId: string, loggedUser_id: string) => {
+    return await Message.findOneAndDelete({ _id: messageId, senderId: loggedUser_id });
+  }
 }
