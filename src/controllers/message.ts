@@ -7,6 +7,7 @@ import HttpStatusCode from "../errors/httpStatusCode";
 import NotFoundError from "../errors/notFoundError";
 import MessageService from "../services/message";
 import ChatService from "../services/chat";
+import { pusher } from "../app";
 
 export default class MessageController {
   constructor(
@@ -46,12 +47,25 @@ export default class MessageController {
         image,
         chatId
       );
-      const lastMessage = (
-        await this.chatService.updateLastMessage(chatId, message.body)
-      )?.lastMessage;
+      const lastMessage = await this.chatService.updateLastMessage(
+        chatId,
+        message.body
+      );
+
+      await pusher.trigger(chatId, "messages:new", message);
+
+      const lastMessagee = lastMessage?.lastMessage;
+      const users = lastMessage?.users;
+
+      users!.map((user) => {
+        pusher.trigger(user._id.toString()!, "conversation:update", {
+          id: chatId,
+          lastMessagee,
+        });
+      });
       res
         .status(HttpStatusCode.CREATED)
-        .json({ success: true, data: message, lastMessage });
+        .json({ success: true, data: message, lastMessagee });
     }
   );
 
