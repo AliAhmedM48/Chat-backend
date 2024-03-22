@@ -1,8 +1,9 @@
-import { check } from "express-validator";
 import validatorMiddleware from "../middlewares/validate";
-import { User } from "../models/user";
+import User from "../models/user";
 
-export const registerValidator = [
+import { check } from "express-validator";
+
+const registerValidator = [
   check("firstName").notEmpty().withMessage("First Name is required"),
   check("lastName").notEmpty().withMessage("Last Name is required"),
   check("email")
@@ -29,7 +30,7 @@ export const registerValidator = [
   validatorMiddleware,
 ];
 
-export const loginValidator = [
+const loginValidator = [
   check("email")
     .notEmpty()
     .withMessage("email is required")
@@ -38,3 +39,5 @@ export const loginValidator = [
   check("password").notEmpty().withMessage("password is required"),
   validatorMiddleware,
 ];
+
+export { registerValidator, loginValidator };

@@ -8,12 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initServer = void 0;
 // * Project dependencies
 const node_http_1 = require("node:http");
-const connectToSocket_1 = require("./connectToSocket");
-const connectToMongoDB_1 = require("./connectToMongoDB");
+const connectToMongoDB_1 = __importDefault(require("./connectToMongoDB"));
+const connectToSocket_1 = __importDefault(require("./connectToSocket"));
 const initServer = (app) => __awaiter(void 0, void 0, void 0, function* () {
     //#region 
     const PORT = process.env.PORT || 3000;
@@ -21,12 +23,12 @@ const initServer = (app) => __awaiter(void 0, void 0, void 0, function* () {
     server
         .listen(PORT, () => {
         // * MongoDB Connection
-        (0, connectToMongoDB_1.connectToMongoDB)(`${process.env.DB_HOST_MONGO}`);
+        (0, connectToMongoDB_1.default)(`${process.env.DB_HOST_MONGO}`);
         // * Socket io initialization
-        (0, connectToSocket_1.connectToSocket)(server);
+        (0, connectToSocket_1.default)(server);
         console.log("Server running at PORT: ", PORT);
     })
         .on("error", (error) => { throw new Error(error.message); }); // * gracefully handle error
     //#endregion
 });
-exports.initServer = initServer;
+exports.default = initServer;

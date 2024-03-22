@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 
-import { Message } from "../models/message";
 import { ioHandleAuthenticateSocket, ioHandleDisconnect, ioHandleError, ioHandleNewMessage, socketEvents } from "../sockets";
+import Message from "../models/message";
 
 const connectToSocket = (server: any) => {
 
@@ -28,4 +28,4 @@ const connectToSocket = (server: any) => {
 
 }
 
-export { connectToSocket };
+export default connectToSocket;

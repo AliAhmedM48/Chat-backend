@@ -1,11 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NotFoundError = void 0;
-const baseError_1 = require("./baseError");
-const httpStatusCode_1 = require("./httpStatusCode");
-class NotFoundError extends baseError_1.BaseError {
+const baseError_1 = __importDefault(require("./baseError"));
+const httpStatusCode_1 = __importDefault(require("./httpStatusCode"));
+class NotFoundError extends baseError_1.default {
     constructor(message = 'Not Found') {
-        super('Not Found', httpStatusCode_1.HttpStatusCode.NOT_FOUND, true, message);
+        super('Not Found', httpStatusCode_1.default.NOT_FOUND, true, message);
     }
 }
-exports.NotFoundError = NotFoundError;
+exports.default = NotFoundError;

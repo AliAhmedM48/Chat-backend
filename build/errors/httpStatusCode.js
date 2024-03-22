@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HttpStatusCode = void 0;
 var HttpStatusCode;
 (function (HttpStatusCode) {
     // * Success
@@ -16,4 +15,5 @@ var HttpStatusCode;
     HttpStatusCode[HttpStatusCode["UNPROCESSABLE_ENTITY"] = 422] = "UNPROCESSABLE_ENTITY";
     // * Server errors
     HttpStatusCode[HttpStatusCode["INTERNAL_SERVER"] = 500] = "INTERNAL_SERVER";
-})(HttpStatusCode || (exports.HttpStatusCode = HttpStatusCode = {}));
+})(HttpStatusCode || (HttpStatusCode = {}));
+exports.default = HttpStatusCode;

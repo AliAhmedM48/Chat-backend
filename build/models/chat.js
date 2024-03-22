@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Chat = void 0;
 const mongoose_1 = require("mongoose");
 const atLeastOneUserValidator = (value) => {
     return value.length > 0;
@@ -13,4 +12,5 @@ const chatSchema = new mongoose_1.Schema({
     isGroup: { type: Boolean, default: false },
 }, { timestamps: true });
 // ^ Model
-exports.Chat = (0, mongoose_1.model)("Chat", chatSchema, "chats");
+const Chat = (0, mongoose_1.model)("Chat", chatSchema, "chats");
+exports.default = Chat;

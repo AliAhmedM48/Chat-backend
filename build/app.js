@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // * Global dependencies
 //#region
-const node_path_1 = require("node:path");
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
@@ -15,41 +14,36 @@ const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 //#endregion
 // * Project dependencies
 //#region
-const user_1 = __importDefault(require("./routes/user"));
-const message_1 = __importDefault(require("./routes/message"));
-const chat_1 = __importDefault(require("./routes/chat"));
-const auth_1 = __importDefault(require("./routes/auth"));
 const errorHandler_1 = __importDefault(require("./middlewares/errorHandler"));
-const initServer_1 = require("./connections/initServer");
-const notFoundError_1 = require("./errors/notFoundError");
-const authenticateUser_1 = require("./middlewares/authenticateUser");
-const swagger_config_1 = require("./swagger.config");
+const routes_1 = require("./routes");
+const swagger_config_1 = __importDefault(require("./swagger.config"));
+const authenticateUser_1 = __importDefault(require("./middlewares/authenticateUser"));
+const notFoundError_1 = __importDefault(require("./errors/notFoundError"));
+const initServer_1 = __importDefault(require("./connections/initServer"));
 //#endregion
 // * configures dotenv to work in the application
 dotenv_1.default.config();
 // * Express initialization
 const app = (0, express_1.default)();
-const swaggerDocs = (0, swagger_jsdoc_1.default)(swagger_config_1.swaggerOptions);
+const swaggerDocs = (0, swagger_jsdoc_1.default)(swagger_config_1.default);
 // * Middlewares
+// TODO: Helmet Package
+// app.use(helmet());
 app.use(express_1.default.json());
 app.use((0, morgan_1.default)("dev"));
 app.use((0, cors_1.default)()); // By default, this will allow all origins, all methods, and all headers
 app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocs));
 // * Routes
-const apiV1 = express_1.default.Router();
-app.use("/api/v1", apiV1);
-apiV1.use("/auth", auth_1.default);
-apiV1.use("/users", authenticateUser_1.checkUserAuthentication, user_1.default);
-apiV1.use("/messages", authenticateUser_1.checkUserAuthentication, message_1.default);
-apiV1.use("/chats", authenticateUser_1.checkUserAuthentication, chat_1.default);
-app.get('/io', (req, res) => {
-    const filePath = (0, node_path_1.join)(__dirname, '..', 'public', 'index.html');
-    res.sendFile(filePath);
-});
-apiV1.all("*", authenticateUser_1.checkUserAuthentication, (req, res, next) => {
-    next(new notFoundError_1.NotFoundError("Invalid api"));
+app.use("/api/v1", routes_1.apiV1);
+// import { join } from "node:path";
+// app.get('/io', (req, res) => {
+//     const filePath = join(__dirname, '..', 'public', 'index.html');
+//     res.sendFile(filePath);
+// });
+app.all("*", authenticateUser_1.default, (req, res, next) => {
+    next(new notFoundError_1.default("Invalid api"));
 });
 // * Error handling
 app.use(errorHandler_1.default);
 // * Server initialization
-(0, initServer_1.initServer)(app);
+(0, initServer_1.default)(app);

@@ -1,31 +1,27 @@
-import { Router } from "express";
 import ChatController from "../controllers/chat";
-import { validateMongoID } from "../middlewares/validateMongoID";
-import { createChatValidations } from "../validations/chat";
+import validateMongoID from "../middlewares/validateMongoID";
+import createChatValidations from "../validations/chat";
 
-class ChatRoutes {
-  router = Router();
-  chatController = new ChatController();
+import { Router } from "express";
 
-  constructor() {
-    this.intializeRoutes();
-  }
+const chatRoutes = (controller: ChatController) => {
+  const router = Router();
 
-  intializeRoutes() {
-    this.router.route("/").get(this.chatController.getByUserIdOrByChatId);
+  router.route("/").get(controller.getByUserIdOrByChatId);
 
-    this.router
-      .route("/createGroup")
-      .post(createChatValidations, this.chatController.createGroup);
+  router
+    .route("/createGroup")
+    .post(createChatValidations, controller.createGroup);
 
-    this.router
-      .route("/:id")
-      .all(validateMongoID)
-      .get(this.chatController.getByUserIdOrByChatId)
+  router
+    .route("/:id")
+    .all(validateMongoID)
+    .get(controller.getByUserIdOrByChatId)
 
-      .put(this.chatController.updateChat)
-      .delete(this.chatController.deleteChat);
-  }
-}
+    .put(controller.updateChat)
+    .delete(controller.leaveChat);
 
-export default new ChatRoutes().router;
+  return router;
+};
+
+export default chatRoutes;
