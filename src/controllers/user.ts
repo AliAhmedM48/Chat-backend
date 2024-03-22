@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
+import User from "../models/user";
 
-import { User } from "../models/user";
-import { NotFoundError } from "../errors/notFoundError";
-import { HttpStatusCode } from "../errors/httpStatusCode";
 
 export class UserController {
 

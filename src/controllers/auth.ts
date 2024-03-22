@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
-import { NotFoundError } from "../errors/notFoundError";
-import { HttpStatusCode } from "../errors/httpStatusCode";
-
 import AuthService from "../services/auth";
 import HttpStatusCode from "../errors/httpStatusCode";
+import User from "../models/user";
+import { bcrypt } from 'bcryptjs';
+import { jwt } from 'jsonwebtoken';
 import NotFoundError from "../errors/notFoundError";
 
 export default class AuthController {
