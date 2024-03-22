@@ -1,9 +1,8 @@
-import validatorMiddleware from "../middlewares/validate";
-import User from "../models/user";
-
 import { check } from "express-validator";
+import validatorMiddleware from "../middlewares/validate";
+import { User } from "../models/user";
 
-const createChatValidations = [
+export const createChatValidations = [
   check("users")
     .isArray().withMessage("users should be array of string")
     .isMongoId().withMessage("Invalid ID formate")
@@ -11,7 +10,7 @@ const createChatValidations = [
 
       const id = (req as any).loggedUser._id; // logged user
 
-      if (!usersIds?.includes(id.toString())) { usersIds?.push(id.toString()); }
+      if (!usersIds.includes(id.toString())) { usersIds.push(id.toString()); }
       const usersSet = new Set(usersIds);
       usersIds = Array.from(usersSet);
 
@@ -25,5 +24,3 @@ const createChatValidations = [
 
   validatorMiddleware,
 ];
-
-export default createChatValidations;

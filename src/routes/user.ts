@@ -9,7 +9,8 @@ export default class UserRoutes {
     this.intializeRoutes();
   }
 
-  private intializeRoutes() {
+  intializeRoutes() {
+
     /**
      * @swagger
      * /api/v1/users:
@@ -20,14 +21,14 @@ export default class UserRoutes {
      *    200:
      *      description: A list of user.
      */
-    this.expressrRouter.route("/")
+    this.router.route("/")
       .get(this.controller.getAllUsers)
       .delete(this.controller.deleteUser)
       .put(this.controller.updateUser);
 
-    this.expressrRouter.route("/:id")
+    this.router.route("/:id")
       .get(validateMongoID, this.controller.getOneUser);
   }
-
 }
 
+export default new UserRoutes().router;

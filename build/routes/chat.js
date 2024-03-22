@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const chat_1 = __importDefault(require("../controllers/chat"));
 const validateMongoID_1 = require("../middlewares/validateMongoID");
+const chat_2 = require("../validations/chat");
 class ChatRoutes {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -13,18 +14,14 @@ class ChatRoutes {
         this.intializeRoutes();
     }
     intializeRoutes() {
-        // * add avatar to chat model
-        // * add isGroup to chat model = default false
-        this.router.route("/createGroup").post(this.chatController.createChat);
-        this.router
-            .route("/:id")
+        this.router.route("/")
+            .get(this.chatController.getByUserIdOrByChatId);
+        this.router.route("/createGroup")
+            .post(chat_2.createChatValidations, this.chatController.createGroup);
+        this.router.route("/:id")
             .all(validateMongoID_1.validateMongoID)
-            // * load all chats by [user id]
-            .get(this.chatController.getAllChats)
-            // * middleware to check by [chat id , user id] if user is already in chat/group
+            .get(this.chatController.getByUserIdOrByChatId)
             .put(this.chatController.updateChat)
-            // * middleware to check by [chat id , user id] if user is already in chat/group
-            // * remove user from group
             .delete(this.chatController.deleteChat);
     }
 }

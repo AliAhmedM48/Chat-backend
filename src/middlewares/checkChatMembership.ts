@@ -1,11 +1,10 @@
 // * verify whether a user is a member of the chat before allowing them to perform certain actions on it
 import { NextFunction, Request, Response } from "express";
-
+import { Chat } from "../models/chat";
+import { UnauthorizedError } from "../errors/unauthorizedError";
 import asyncHandler from "express-async-handler";
-import Chat from "../models/chat";
-import UnauthorizedError from "../errors/unauthorizedError";
 
-const checkChatMembership = asyncHandler(
+export const checkChatMembership = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let { senderId, chatId } = req.body;
 
@@ -18,5 +17,3 @@ const checkChatMembership = asyncHandler(
     }
   }
 );
-
-export default checkChatMembership;

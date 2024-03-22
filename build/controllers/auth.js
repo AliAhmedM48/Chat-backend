@@ -18,6 +18,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const notFoundError_1 = require("../errors/notFoundError");
+const httpStatusCode_1 = require("../errors/httpStatusCode");
 class AuthController {
     constructor() {
         this.register = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
@@ -30,21 +31,27 @@ class AuthController {
                 password: hashedPassword,
                 avatar,
             });
-            res.status(201).json({ success: true, data: user });
+            res.status(httpStatusCode_1.HttpStatusCode.CREATED).json({ success: true, data: user });
         }));
         this.login = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
             const user = yield user_1.User.findOne({ email });
+            if (user)
+                user.isOnline = true;
+            user === null || user === void 0 ? void 0 : user.save();
             const isMatch = yield bcryptjs_1.default.compare(password, user ? user.password : "");
             if (!isMatch || !user) {
                 return next(new notFoundError_1.NotFoundError("Invalid password or email"));
-                // res.status(400).json({ Message: "Invalid password or email" });
-                // return;
             }
             const token = jsonwebtoken_1.default.sign({ userId: user._id }, `${process.env.JWT_SECRET_KEY}`, { expiresIn: process.env.JWT_EXPIRES_IN });
             user.isOnline = true;
             user.password = "";
-            res.status(200).json({ success: true, data: user, token });
+            res.status(httpStatusCode_1.HttpStatusCode.OK).json({ success: true, data: user, token });
+        }));
+        this.logout = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            const id = req.loggedUser._id; // logged user
+            const user = yield user_1.User.findByIdAndUpdate(id, { isOnline: false });
+            res.status(httpStatusCode_1.HttpStatusCode.NO_CONTENT).end();
         }));
     }
 }

@@ -1,19 +1,26 @@
 // * Global dependencies
 //#region
+import { join } from "node:path";
+
 import express, { Application, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 //#endregion
 
 // * Project dependencies
 //#region
+import userRoute from "./routes/user";
+import messageRoute from "./routes/message";
+import chatRoute from "./routes/chat";
+import authRoute from "./routes/auth";
 import errorHandler from "./middlewares/errorHandler";
-import { apiV1 } from "./routes";
-import swaggerOptions from "./swagger.config";
-import checkUserAuthentication from "./middlewares/authenticateUser";
-import NotFoundError from "./errors/notFoundError";
-import initServer from "./connections/initServer";
+import { initServer } from "./connections/initServer";
+import { NotFoundError } from "./errors/notFoundError";
+import { checkUserAuthentication } from "./middlewares/authenticateUser";
+import { swaggerOptions } from "./swagger.config";
 //#endregion
 
 // * configures dotenv to work in the application
@@ -21,6 +28,7 @@ dotenv.config();
 
 // * Express initialization
 const app: Application = express();
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
 // * Middlewares
 
@@ -30,29 +38,30 @@ const app: Application = express();
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cors()); // By default, this will allow all origins, all methods, and all headers
-// Example configuration to allow only specific origins
-// app.use(cors({
-//   origin: 'http://example.com' // Allow requests from http://example.com
-// }));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 
 // * Routes
+const apiV1 = express.Router();
 app.use("/api/v1", apiV1);
 
-// import { join } from "node:path";
-// app.get('/io', (req, res) => {
-//     const filePath = join(__dirname, '..', 'public', 'index.html');
-//     res.sendFile(filePath);
-// });
+apiV1.use("/auth", authRoute);
+apiV1.use("/users", checkUserAuthentication, userRoute);
+apiV1.use("/messages", checkUserAuthentication, messageRoute);
+apiV1.use("/chats", checkUserAuthentication, chatRoute);
+
+app.get('/io', (req, res) => {
+    const filePath = join(__dirname, '..', 'public', 'index.html');
+    res.sendFile(filePath);
+});
 
 
-app.all("*", checkUserAuthentication, (req: Request, res: Response, next: NextFunction) => {
+apiV1.all("*", checkUserAuthentication, (req: Request, res: Response, next: NextFunction) => {
     next(new NotFoundError("Invalid api"));
 });
 
 // * Error handling
 app.use(errorHandler);
 
-// * connecting to Mongodb
-connectToMongoDB(`${process.env.DB_HOST_MONGO}`);
-
-export { app };
+// * Server initialization
+initServer(app);

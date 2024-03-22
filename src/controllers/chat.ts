@@ -1,53 +1,53 @@
 import { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
-
-import Chat from "../models/chat";
-import HttpStatusCode from "../errors/httpStatusCode";
-import NotFoundError from "../errors/notFoundError";
-import ChatService from "../services/chat";
+import { NotFoundError } from "../errors/notFoundError";
+import { HttpStatusCode } from "../errors/httpStatusCode";
+import BadRequestError from "../errors/badRequestError";
 
 interface IChatController {
-  createChat(req: Request, res: Response, next: NextFunction): Promise<void>;
-  getAllChats(req: Request, res: Response, next: NextFunction): Promise<void>;
+  createGroup(req: Request, res: Response, next: NextFunction): Promise<void>;
+  getByUserIdOrByChatId(req: Request, res: Response, next: NextFunction): Promise<void>;
   updateChat(req: Request, res: Response, next: NextFunction): Promise<void>;
   deleteChat(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
 
-export default class ChatController implements IChatController {
-
-  constructor(private service: ChatService) { }
+class ChatController implements IChatController {
 
   createGroup = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       let { name, lastMessage } = req.body;
       let users = (req as any).users; // from creation validation middleware
+      const chat = await Chat.create({ name, users, lastMessage, isGroup: true });
 
-      const chat = await this.service.createGroup(users, name, lastMessage)
       res.status(HttpStatusCode.CREATED).json({ message: "create OK", chat });
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
-  getAllChats = asyncHandler(
+  getByUserIdOrByChatId = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
 
       let id = req.params.id;
+      if (!id) {
+        id = (req as any).loggedUser._id; // logged user   
+      }
 
-      // logged user   
-      if (!id) { id = (req as any).loggedUser._id; }
-      let chats = await this.service.findChatsByChatId(id);
+      let chats = await Chat.find({ _id: id }).populate("users");
 
       if (chats.length === 0) {
-        chats = await this.service.findChatsByUserId(id);
+        chats = await Chat.find({ users: id }).populate("users");
       }
-      res.status(200).send(chats);
+
+      res.status(HttpStatusCode.OK).json(chats);
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
   updateChat = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const { id } = req.params;
-      const chat = await this.service.updateChat(id, req.body);
-      if (!chat) { return next(new NotFoundError("chat not found")); }
+      const chat = await Chat.findByIdAndUpdate(id, req.body, { new: true });
+      if (!chat) {
+        return next(new NotFoundError("chat not found"));
+      }
       res.status(HttpStatusCode.OK).send(chat);
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
@@ -58,7 +58,7 @@ export default class ChatController implements IChatController {
       const { userId, chatId } = req.body;
       // const { id } = req.params;
       // const chat = await Chat.findByIdAndDelete(id);
-      const chat = await Chat.findByIdAndUpdate(
+      const chat = await Chat.findByIdAndDelete(
         chatId,
         {
           $pull: { users: userId },

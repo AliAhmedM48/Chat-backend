@@ -1,4 +1,4 @@
-const swaggerOptions = {
+export const swaggerOptions = {
     swaggerDefinition: {
         openapi: '3.0.0',
         info: {
@@ -13,5 +13,3 @@ const swaggerOptions = {
     },
     apis: ['./src/routes/user.ts'],
 };
-
-export default swaggerOptions;

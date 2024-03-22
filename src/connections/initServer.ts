@@ -1,9 +1,8 @@
 // * Project dependencies
 import { createServer } from "node:http";
 import { Application } from "express";
-import connectToMongoDB from "./connectToMongoDB";
-import connectToSocket from "./connectToSocket";
-
+import { connectToSocket } from "./connectToSocket";
+import { connectToMongoDB } from "./connectToMongoDB";
 
 
 const initServer = async (app: Application) => {
@@ -28,4 +27,4 @@ const initServer = async (app: Application) => {
     //#endregion
 }
 
-export default initServer;
+export { initServer };
