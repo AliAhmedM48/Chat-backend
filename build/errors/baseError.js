@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BaseError = void 0;
 class BaseError extends Error {
     constructor(name, statusCode, isOperational, message) {
         super(message);
@@ -15,6 +14,7 @@ class BaseError extends Error {
     }
     toObject() {
         return {
+            success: false,
             name: this.name,
             statusCode: this.statusCode,
             isOperational: this.isOperational,
@@ -23,4 +23,4 @@ class BaseError extends Error {
         };
     }
 }
-exports.BaseError = BaseError;
+exports.default = BaseError;

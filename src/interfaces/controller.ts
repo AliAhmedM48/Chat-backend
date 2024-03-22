@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-export interface Controller {
+export default interface Controller {
     create(req: Request, res: Response, next: NextFunction): Promise<void>;
     findAll(req: Request, res: Response, next: NextFunction): Promise<void>;
     findOne(req: Request, res: Response, next: NextFunction): Promise<void>;

@@ -1,21 +1,17 @@
 import { Router } from "express";
-import { AuthController } from "../controllers/auth";
 import { loginValidator, registerValidator } from "../validations/auth";
-import { checkUserAuthentication } from "../middlewares/authenticateUser";
+import AuthController from "../controllers/auth";
+import checkUserAuthentication from "../middlewares/authenticateUser";
 
-class AuthRoutes {
-  router = Router();
-  controller = new AuthController();
-  constructor() {
-    this.intializeRoutes();
-  }
+const authRoutes = (controller: AuthController) => {
+  const router = Router();
 
-  intializeRoutes() {
-    this.router
-      .post("/register", registerValidator, this.controller.register)
-      .post("/login", loginValidator, this.controller.login)
-      .put("/logout", checkUserAuthentication, this.controller.logout);
-  }
+  router
+    .post("/register", registerValidator, controller.register)
+    .post("/login", loginValidator, controller.login)
+    .put("/logout", checkUserAuthentication, controller.logout);
+
+  return router;
 }
 
-export default new AuthRoutes().router;
+export default authRoutes

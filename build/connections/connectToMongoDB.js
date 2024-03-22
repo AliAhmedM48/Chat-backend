@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectToMongoDB = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const connectToMongoDB = (db_url) => __awaiter(void 0, void 0, void 0, function* () {
     //#region 
@@ -30,4 +29,4 @@ const connectToMongoDB = (db_url) => __awaiter(void 0, void 0, void 0, function*
     }
     //#endregion
 });
-exports.connectToMongoDB = connectToMongoDB;
+exports.default = connectToMongoDB;

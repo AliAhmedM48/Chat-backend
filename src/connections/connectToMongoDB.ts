@@ -17,4 +17,4 @@ const connectToMongoDB = async (db_url: string) => {
 }
 
 
-export { connectToMongoDB };
+export default connectToMongoDB;

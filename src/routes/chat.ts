@@ -1,33 +1,28 @@
-import { Router } from "express";
 import ChatController from "../controllers/chat";
-import { validateMongoID } from "../middlewares/validateMongoID";
-import { createChatValidations } from "../validations/chat";
+import validateMongoID from "../middlewares/validateMongoID";
+import createChatValidations from "../validations/chat";
 
-class ChatRoutes {
-  router = Router();
-  chatController = new ChatController();
+import { Router } from "express";
 
-  constructor() {
-    this.intializeRoutes();
-  }
+const chatRoutes = (controller: ChatController) => {
+  const router = Router();
 
-  intializeRoutes() {
+  router
+    .route("/")
+    .get(controller.getByUserIdOrByChatId)
+    .delete(controller.leaveChat);
 
-    this.router.route("/")
-      .get(this.chatController.getByUserIdOrByChatId)
+  router
+    .route("/createGroup")
+    .post(createChatValidations, controller.createGroup);
 
+  router
+    .route("/:id")
+    .all(validateMongoID)
+    .get(controller.getByUserIdOrByChatId)
+    .put(controller.updateChat);
 
-    this.router.route("/createGroup")
-      .post(createChatValidations, this.chatController.createGroup);
+  return router;
+};
 
-    this.router.route("/:id")
-      .all(validateMongoID)
-      .get(this.chatController.getByUserIdOrByChatId)
-
-      .put(this.chatController.updateChat)
-      .delete(this.chatController.deleteChat);
-
-  }
-}
-
-export default new ChatRoutes().router;
+export default chatRoutes;

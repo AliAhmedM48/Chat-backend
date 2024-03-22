@@ -1,35 +1,30 @@
+import UserController from "../controllers/user";
+import validateMongoID from "../middlewares/validateMongoID";
+
 import { Router } from "express";
-import { UserController } from "../controllers/user";
-import { validateMongoID } from "../middlewares/validateMongoID";
-import { validateUpdateRequest } from "../validations/user";
 
-class UserRoutes {
-  router = Router();
-  controller = new UserController();
-  constructor() {
-    this.intializeRoutes();
-  }
 
-  intializeRoutes() {
+const userRoutes = (controller: UserController) => {
+  const router = Router();
+  /**
+      * @swagger
+      * /api/v1/users:
+      *  get:
+      *    summary: Get all users
+      *    description: Retrieve a list of all users.
+      *  responses:
+      *    200:
+      *      description: A list of user.
+      */
+  router.route("/")
+    .get(controller.getAllUsers)
+    .delete(controller.deleteUser)
+    .put(controller.updateUser);
 
-    /**
-     * @swagger
-     * /api/v1/users:
-     *  get:
-     *    summary: Get all users
-     *    description: Retrieve a list of all users.
-     *  responses:
-     *    200:
-     *      description: A list of user.
-     */
-    this.router.route("/")
-      .get(this.controller.getAllUsers)
-      .delete(this.controller.deleteUser)
-      .put(this.controller.updateUser);
+  router.route("/:id")
+    .get(validateMongoID, controller.getOneUser);
 
-    this.router.route("/:id")
-      .get(validateMongoID, this.controller.getOneUser);
-  }
+  return router;
 }
 
-export default new UserRoutes().router;
+export default userRoutes

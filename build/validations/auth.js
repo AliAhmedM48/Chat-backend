@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginValidator = exports.registerValidator = void 0;
-const express_validator_1 = require("express-validator");
 const validate_1 = __importDefault(require("../middlewares/validate"));
-const user_1 = require("../models/user");
-exports.registerValidator = [
+const user_1 = __importDefault(require("../models/user"));
+const express_validator_1 = require("express-validator");
+const registerValidator = [
     (0, express_validator_1.check)("firstName").notEmpty().withMessage("First Name is required"),
     (0, express_validator_1.check)("lastName").notEmpty().withMessage("Last Name is required"),
     (0, express_validator_1.check)("email")
@@ -25,7 +25,7 @@ exports.registerValidator = [
         .isEmail()
         .withMessage("Invalid email")
         .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
-        const user = yield user_1.User.findOne({ email: value });
+        const user = yield user_1.default.findOne({ email: value });
         if (user) {
             throw new Error("E-mail already exist");
         }
@@ -42,7 +42,8 @@ exports.registerValidator = [
     }),
     validate_1.default,
 ];
-exports.loginValidator = [
+exports.registerValidator = registerValidator;
+const loginValidator = [
     (0, express_validator_1.check)("email")
         .notEmpty()
         .withMessage("email is required")
@@ -51,3 +52,4 @@ exports.loginValidator = [
     (0, express_validator_1.check)("password").notEmpty().withMessage("password is required"),
     validate_1.default,
 ];
+exports.loginValidator = loginValidator;

@@ -1,10 +1,10 @@
 import { check } from "express-validator";
 import validatorMiddleware from "../middlewares/validate";
-import { User } from "../models/user";
-import { Chat } from "../models/chat";
-import { NotFoundError } from "../errors/notFoundError";
+import Chat from "../models/chat";
+import NotFoundError from "../errors/notFoundError";
+import User from "../models/user";
 
-export const createMessageValidations = [
+const createMessageValidations = [
   check("chatId")
     .optional().isMongoId().withMessage("Invalid ID formate")
     .custom(async (chatId) => {
@@ -25,3 +25,5 @@ export const createMessageValidations = [
 
   validatorMiddleware,
 ];
+
+export default createMessageValidations;

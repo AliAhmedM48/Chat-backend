@@ -12,10 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateUpdateRequest = void 0;
 const validate_1 = __importDefault(require("../middlewares/validate"));
 const badRequestError_1 = __importDefault(require("../errors/badRequestError"));
-exports.validateUpdateRequest = [
+const validateUpdateRequest = [
     (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { firstName, lastName, email, password, avatar } = req.body;
         //#region request validation
@@ -35,3 +34,4 @@ exports.validateUpdateRequest = [
     }),
     validate_1.default
 ];
+exports.default = validateUpdateRequest;

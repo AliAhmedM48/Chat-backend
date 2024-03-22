@@ -12,19 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkUserAuthentication = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const unauthorizedError_1 = require("../errors/unauthorizedError");
-const user_1 = require("../models/user");
-exports.checkUserAuthentication = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const user_1 = __importDefault(require("../models/user"));
+const unauthorizedError_1 = __importDefault(require("../errors/unauthorizedError"));
+const checkUserAuthentication = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     // 1) check if token exist
     let token;
     if (req.headers.authorization) {
         token = req.headers.authorization.split(" ")[1];
     }
     if (!token) {
-        return next(new unauthorizedError_1.UnauthorizedError("you are not login please login to access this route"));
+        return next(new unauthorizedError_1.default("you are not login please login to access this route"));
     }
     //2) verify token (no changes happens, expired token)
     if (!process.env.JWT_SECRET_KEY) {
@@ -33,10 +32,11 @@ exports.checkUserAuthentication = (0, express_async_handler_1.default)((req, res
     const secretKey = process.env.JWT_SECRET_KEY;
     const decoded = jsonwebtoken_1.default.verify(token, secretKey);
     // 3) Check if user exists
-    const currentUser = yield user_1.User.findById(decoded.userId);
+    const currentUser = yield user_1.default.findById(decoded.userId);
     if (!currentUser) {
-        return next(new unauthorizedError_1.UnauthorizedError("The user that belong to this token does no longer exist"));
+        return next(new unauthorizedError_1.default("The user that belong to this token does no longer exist"));
     }
     req.loggedUser = currentUser;
     next();
 }));
+exports.default = checkUserAuthentication;

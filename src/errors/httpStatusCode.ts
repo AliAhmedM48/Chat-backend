@@ -1,4 +1,4 @@
-export enum HttpStatusCode {
+enum HttpStatusCode {
 
     // * Success
     OK = 200, // Indicates that the [request has succeeded].
@@ -18,3 +18,5 @@ export enum HttpStatusCode {
     INTERNAL_SERVER = 500, // Indicates that the server encountered an unexpected condition that prevented it from fulfilling the request.
 
 }
+
+export default HttpStatusCode;
