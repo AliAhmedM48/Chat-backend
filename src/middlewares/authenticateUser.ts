@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-// * check user authentication
-=======
 import asyncHandler from "express-async-handler";
 import { NextFunction, Request, Response } from "express";
 import jwt, { Secret } from "jsonwebtoken";
@@ -46,4 +43,3 @@ const checkUserAuthentication = asyncHandler(
 );
 
 export default checkUserAuthentication;
->>>>>>> Stashed changes

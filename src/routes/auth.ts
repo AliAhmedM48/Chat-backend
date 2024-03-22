@@ -1,10 +1,7 @@
 import { Router } from "express";
 import { loginValidator, registerValidator } from "../validations/auth";
-<<<<<<< Updated upstream
-=======
 import AuthController from "../controllers/auth";
 import checkUserAuthentication from "../middlewares/authenticateUser";
->>>>>>> Stashed changes
 
 export default class AuthRoutes {
   expressrRouter = Router();

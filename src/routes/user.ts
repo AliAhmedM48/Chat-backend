@@ -9,17 +9,6 @@ export default class UserRoutes {
     this.intializeRoutes();
   }
 
-<<<<<<< Updated upstream
-  intializeRoutes() {
-    this.router.route("/").get(this.controller.getAllUsers);
-
-    this.router
-      .route("/:id")
-      .all(validateMongoID)
-      .get(this.controller.getOneUser)
-      .put(validateUpdateRequest, this.controller.updateUser)
-      .delete(this.controller.deleteUser);
-=======
   private intializeRoutes() {
     /**
      * @swagger
@@ -38,7 +27,6 @@ export default class UserRoutes {
 
     this.expressrRouter.route("/:id")
       .get(validateMongoID, this.controller.getOneUser);
->>>>>>> Stashed changes
   }
 
 }

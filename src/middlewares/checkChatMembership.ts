@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-// * verify whether a user is a member of the chat before allowing them to perform certain actions on it
-=======
 // * verify whether a user is a member of the chat before allowing them to perform certain actions on it
 import { NextFunction, Request, Response } from "express";
 
@@ -23,4 +20,3 @@ const checkChatMembership = asyncHandler(
 );
 
 export default checkChatMembership;
->>>>>>> Stashed changes

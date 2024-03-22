@@ -1,12 +1,6 @@
-<<<<<<< Updated upstream
-import { Router } from "express";
-import { MessageController } from "../controllers/message";
-import { validateMongoID } from "../middlewares/validateMongoID";
-=======
 import MessageController from "../controllers/message";
 import createMessageValidations from "../validations/message";
 import validateMongoID from "../middlewares/validateMongoID";
->>>>>>> Stashed changes
 
 import { Router } from "express";
 
@@ -25,16 +19,10 @@ export default class MessageRoutes {
       // * and user is the owner of this message
       .delete(this.controller.deleteMessage);
 
-<<<<<<< Updated upstream
-    // this.router
-    // .route("/messagesInGroup")
-    // .post(this.controller.createMessagesInGroup);
-=======
     this.expressrRouter
       .route("/:chatId")
       .all(validateMongoID)
       .get(this.controller.getAllMessages);
->>>>>>> Stashed changes
 
     this.expressrRouter
       .route("/:id")

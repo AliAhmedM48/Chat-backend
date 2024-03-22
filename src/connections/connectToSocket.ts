@@ -1,9 +1,8 @@
-<<<<<<< Updated upstream
-=======
 import { Server } from "socket.io";
 
-import { ioHandleAuthenticateSocket, ioHandleDisconnect, ioHandleError, ioHandleNewMessage, socketEvents } from "../sockets";
+// import { ioHandleAuthenticateSocket, ioHandleDisconnect, ioHandleError, ioHandleNewMessage, socketEvents } from "../sockets";
 import Message from "../models/message";
+import { ioHandleAuthenticateSocket } from './../sockets/index';
 
 const connectToSocket = (server: any) => {
 
@@ -31,4 +30,3 @@ const connectToSocket = (server: any) => {
 }
 
 export default connectToSocket;
->>>>>>> Stashed changes

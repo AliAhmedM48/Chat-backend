@@ -1,9 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
-<<<<<<< Updated upstream
-import { NotFoundError } from "../errors/notFoundError";
-=======
->>>>>>> Stashed changes
 
 import BadRequestError from "../errors/badRequestError";
 import Chat from "../models/chat";
@@ -24,13 +20,8 @@ export default class MessageController {
 
   createMessage = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-<<<<<<< Updated upstream
-      let { senderId, receiverId, body, chatId } = req.body;
-
-=======
       let { receiverId, body, chatId, image } = req.body;
       const id = (req as any).loggedUser._id; // logged user
->>>>>>> Stashed changes
       if (!(receiverId || chatId)) {
         res.status(401).json({ message: "Send chatId or receiverId" });
         return;
@@ -38,36 +29,6 @@ export default class MessageController {
       // * CHECK Chat ID /////// check if chat id is provided
       if (!chatId) {
         // ! FIRST CASE /////// private chat /////// in case client start new chat from users list
-<<<<<<< Updated upstream
-        //#region 
-        const existingChat = await Chat.findOne({ $and: [{ isGroup: false }, { users: { $all: [senderId, receiverId] } }] });
-        chatId = existingChat ? existingChat._id : (await Chat.create({ users: [senderId, receiverId] }))._id
-        //#endregion
-      }
-
-      // ! SECOND CASE /////// create group /////OR///// choose chat from chat list [chat / group]
-      // ^ check by [chat id , user id] if user is [not] already in chat/group
-      const existingChat = await Chat.findOne({ _id: chatId, users: { $in: [senderId] } });
-      if (!existingChat) {
-        res.status(401).json({ message: "Unauthorized: You are not in the chat" });
-        return;
-      }
-
-      const message = await Message.create({ senderId, chatId, body });
-      res.status(201).json({ success: true, data: message });
-    }
-  );
-
-  // createMessagesInGroup = asyncHandler(
-  //   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  //     const { senderId, chatId, body } = req.body;
-  //     const message = await Message.create({
-  //       senderId: senderId,
-  //       chatId: chatId,
-  //       body: body,
-  //     });
-  //     res.status(201).json({ success: true, data: message });
-=======
         //#region
         const existingChat = await this.chatService.getPreviousChat(id, receiverId);
         chatId = existingChat
@@ -129,7 +90,6 @@ export default class MessageController {
 
   //     res.status(HttpStatusCode.CREATED)
   //       .json({ success: true, data: message, lastMessage });
->>>>>>> Stashed changes
   //   }
   // );
 
@@ -137,12 +97,8 @@ export default class MessageController {
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { id } = req.params;
 
-<<<<<<< Updated upstream
-      let messages = await Message.find({ chatId: id });
-=======
       const checkChats = await this.chatService Chat.findById(chatId);
       if (!checkChats) { return next(new BadRequestError('chat id not found')); }
->>>>>>> Stashed changes
 
       if (messages.length === 0 || !messages) {
         return next(new NotFoundError("Messages not found"));
