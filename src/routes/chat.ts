@@ -1,6 +1,8 @@
 import ChatController from "../controllers/chat";
-import { validateMongoID } from "../middlewares/validateMongoID";
-import { createChatValidations } from "../validations/chat";
+import validateMongoID from "../middlewares/validateMongoID";
+import createChatValidations from "../validations/chat";
+
+import { Router } from "express";
 
 // export default class  ChatRoutes {
 class ChatRoutes {
@@ -9,23 +11,22 @@ class ChatRoutes {
     this.intializeRoutes();
   }
 
-  intializeRoutes() {
+  private intializeRoutes() {
 
-    this.router.route("/")
-      .get(this.chatController.getByUserIdOrByChatId)
+    this.expressrRouter.route("/")
+      .get(this.controller.getByUserIdOrByChatId)
 
+    this.expressrRouter.route("/createGroup")
+      .post(createChatValidations, this.controller.createGroup);
 
-    this.router.route("/createGroup")
-      .post(createChatValidations, this.chatController.createGroup);
-
-    this.router.route("/:id")
+    this.expressrRouter.route("/:id")
       .all(validateMongoID)
-      .get(this.chatController.getByUserIdOrByChatId)
+      .get(this.controller.getByUserIdOrByChatId)
 
-      .put(this.chatController.updateChat)
-      .delete(this.chatController.deleteChat);
+      .put(this.controller.updateChat)
+      .delete(this.controller.deleteChat);
 
   }
 }
 
-export default new ChatRoutes().router;
+export default ChatRoutes;

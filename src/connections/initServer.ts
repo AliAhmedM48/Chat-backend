@@ -5,6 +5,7 @@ import connectToMongoDB from "./connectToMongoDB";
 import connectToSocket from "./connectToSocket";
 
 
+
 const initServer = async (app: Application) => {
 
     //#region 
@@ -27,4 +28,4 @@ const initServer = async (app: Application) => {
     //#endregion
 }
 
-export { initServer };
+export default initServer;

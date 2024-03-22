@@ -3,14 +3,10 @@ import createMessageValidations from "../validations/message";
 import validateMongoID from "../middlewares/validateMongoID";
 
 import { Router } from "express";
-import { MessageController } from "../controllers/message";
-import { validateMongoID } from "../middlewares/validateMongoID";
-import { createMessageValidations } from "../validations/message";
 
-class MessageRoutes {
-  router = Router();
-  controller = new MessageController();
-  constructor() {
+export default class MessageRoutes {
+  expressrRouter = Router();
+  constructor(private controller: MessageController) {
     this.intializeRoutes();
   }
 
@@ -20,7 +16,7 @@ class MessageRoutes {
       .post(createMessageValidations, this.controller.createMessage)
       .delete(this.controller.deleteMessage); // two cases, mutiple messages or one, [body.id]
 
-    this.router
+    this.expressrRouter
       .route("/:chatId")
       .all(validateMongoID)
       .get(this.controller.getAllMessages);

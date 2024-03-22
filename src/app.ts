@@ -1,7 +1,5 @@
 // * Global dependencies
 //#region
-import { join } from "node:path";
-
 import express, { Application, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -12,15 +10,12 @@ import swaggerUi from "swagger-ui-express";
 
 // * Project dependencies
 //#region
-import userRoute from "./routes/user";
-import messageRoute from "./routes/message";
-import chatRoute from "./routes/chat";
-import authRoute from "./routes/auth";
 import errorHandler from "./middlewares/errorHandler";
-import { initServer } from "./connections/initServer";
-import { NotFoundError } from "./errors/notFoundError";
-import { checkUserAuthentication } from "./middlewares/authenticateUser";
-import { swaggerOptions } from "./swagger.config";
+import { apiV1 } from "./routes";
+import swaggerOptions from "./swagger.config";
+import checkUserAuthentication from "./middlewares/authenticateUser";
+import NotFoundError from "./errors/notFoundError";
+import initServer from "./connections/initServer";
 //#endregion
 
 // * configures dotenv to work in the application
@@ -42,21 +37,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 // * Routes
-const apiV1 = express.Router();
 app.use("/api/v1", apiV1);
 
-apiV1.use("/auth", authRoute);
-apiV1.use("/users", checkUserAuthentication, userRoute);
-apiV1.use("/messages", checkUserAuthentication, messageRoute);
-apiV1.use("/chats", checkUserAuthentication, chatRoute);
-
-app.get('/io', (req, res) => {
-    const filePath = join(__dirname, '..', 'public', 'index.html');
-    res.sendFile(filePath);
-});
+// import { join } from "node:path";
+// app.get('/io', (req, res) => {
+//     const filePath = join(__dirname, '..', 'public', 'index.html');
+//     res.sendFile(filePath);
+// });
 
 
-apiV1.all("*", checkUserAuthentication, (req: Request, res: Response, next: NextFunction) => {
+app.all("*", checkUserAuthentication, (req: Request, res: Response, next: NextFunction) => {
     next(new NotFoundError("Invalid api"));
 });
 
