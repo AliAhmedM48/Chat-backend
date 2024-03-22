@@ -4,21 +4,32 @@ import asyncHandler from "express-async-handler";
 import { NotFoundError } from "../errors/notFoundError";
 import { HttpStatusCode } from "../errors/httpStatusCode";
 import BadRequestError from "../errors/badRequestError";
+import { pusher } from "../app";
 
 interface IChatController {
   createGroup(req: Request, res: Response, next: NextFunction): Promise<void>;
-  getByUserIdOrByChatId(req: Request, res: Response, next: NextFunction): Promise<void>;
+  getByUserIdOrByChatId(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
   updateChat(req: Request, res: Response, next: NextFunction): Promise<void>;
   deleteChat(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
 
 class ChatController implements IChatController {
-
   createGroup = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       let { name, lastMessage } = req.body;
       let users = (req as any).users; // from creation validation middleware
-      const chat = await Chat.create({ name, users, lastMessage, isGroup: true });
+      const chat = await Chat.create({
+        name,
+        users,
+        lastMessage,
+        isGroup: true,
+      });
+
+      await pusher.trigger(`chatNew`, "chats:new", { chat });
 
       res.status(HttpStatusCode.CREATED).json({ message: "create OK", chat });
     }
@@ -26,10 +37,9 @@ class ChatController implements IChatController {
 
   getByUserIdOrByChatId = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-
       let id = req.params.id;
       if (!id) {
-        id = (req as any).loggedUser._id; // logged user   
+        id = (req as any).loggedUser._id; // logged user
       }
 
       let chats = await Chat.find({ _id: id }).populate("users");
@@ -58,12 +68,9 @@ class ChatController implements IChatController {
       const { userId, chatId } = req.body;
       // const { id } = req.params;
       // const chat = await Chat.findByIdAndDelete(id);
-      const chat = await Chat.findByIdAndDelete(
-        chatId,
-        {
-          $pull: { users: userId },
-        },
-      );
+      const chat = await Chat.findByIdAndDelete(chatId, {
+        $pull: { users: userId },
+      });
       console.log("User removed from chat successfully.");
 
       if (!chat) {

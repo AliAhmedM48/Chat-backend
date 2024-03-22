@@ -8,6 +8,7 @@ import cors from "cors";
 import morgan from "morgan";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
+import Pusher from "pusher";
 //#endregion
 
 // * Project dependencies
@@ -34,8 +35,7 @@ const swaggerDocs = swaggerJSDoc(swaggerOptions);
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cors()); // By default, this will allow all origins, all methods, and all headers
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // * Routes
 const apiV1 = express.Router();
@@ -46,18 +46,29 @@ apiV1.use("/users", checkUserAuthentication, userRoute);
 apiV1.use("/messages", checkUserAuthentication, messageRoute);
 apiV1.use("/chats", checkUserAuthentication, chatRoute);
 
-app.get('/io', (req, res) => {
-    const filePath = join(__dirname, '..', 'public', 'index.html');
-    res.sendFile(filePath);
+app.get("/io", (req, res) => {
+  const filePath = join(__dirname, "..", "public", "index.html");
+  res.sendFile(filePath);
 });
 
-
-apiV1.all("*", checkUserAuthentication, (req: Request, res: Response, next: NextFunction) => {
+apiV1.all(
+  "*",
+  checkUserAuthentication,
+  (req: Request, res: Response, next: NextFunction) => {
     next(new NotFoundError("Invalid api"));
-});
+  }
+);
 
 // * Error handling
 app.use(errorHandler);
+
+export const pusher = new Pusher({
+  appId: `${process.env.PUSHER_APP_ID}`,
+  key: `${process.env.PUSHER_APP_KEY}`,
+  secret: `${process.env.PUSHER_SECRET}`,
+  cluster: "mt1",
+  useTLS: true,
+});
 
 // * Server initialization
 initServer(app);

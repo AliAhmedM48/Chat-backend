@@ -6,6 +6,7 @@ import { NotFoundError } from "../errors/notFoundError";
 import BadRequestError from "../errors/badRequestError";
 import { UnauthorizedError } from "../errors/unauthorizedError";
 import { HttpStatusCode } from "../errors/httpStatusCode";
+import { pusher } from "../app";
 
 export class MessageController {
   createMessage = asyncHandler(
@@ -22,10 +23,7 @@ export class MessageController {
         // ! FIRST CASE /////// private chat /////// in case client start new chat from users list
         //#region
         const existingChat = await Chat.findOne({
-          $and: [
-            { isGroup: false },
-            { users: { $all: [id, receiverId] } },
-          ],
+          $and: [{ isGroup: false }, { users: { $all: [id, receiverId] } }],
         });
 
         chatId = existingChat
@@ -45,16 +43,31 @@ export class MessageController {
         next(new UnauthorizedError("You are not in the chat"));
       }
 
-      const message = await Message.create({ senderId: id, chatId, body, seenIds: id, image });
+      const message = await Message.create({
+        senderId: id,
+        chatId,
+        body,
+        seenIds: id,
+        image,
+      });
 
-      const lastMessage = (
-        await Chat.findByIdAndUpdate(chatId,
-          { lastMessage: message.body },
-          { new: true }
-        )
-      )?.lastMessage;
+      const updateLastMessage = await Chat.findByIdAndUpdate(
+        chatId,
+        { lastMessage: message.body },
+        { new: true }
+      );
 
-      res.status(HttpStatusCode.CREATED)
+      await pusher.trigger(`chatId`, "messages:new", { message });
+
+      pusher.trigger(`chatId`, "chat_updated", {
+        chatId: updateLastMessage?._id,
+        lastMessage: updateLastMessage?.lastMessage,
+      });
+
+      const lastMessage = updateLastMessage?.lastMessage;
+
+      res
+        .status(HttpStatusCode.CREATED)
         .json({ success: true, data: message, lastMessage });
     }
   );
@@ -62,10 +75,12 @@ export class MessageController {
   getAllMessages = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { chatId } = req.params;
-      const { loggedUser } = (req as any); // logged user
+      const { loggedUser } = req as any; // logged user
 
       const checkChats = await Chat.findById(chatId);
-      if (!checkChats) { return next(new BadRequestError('chat id not found')); }
+      if (!checkChats) {
+        return next(new BadRequestError("chat id not found"));
+      }
 
       let messages = await Message.find({ chatId: chatId });
 
@@ -112,7 +127,9 @@ export class MessageController {
       if (deletedMessages.deletedCount === 0) {
         return next(new NotFoundError("Messages not found"));
       }
-      res.status(HttpStatusCode.OK).json({ success: true, data: deletedMessages });
+      res
+        .status(HttpStatusCode.OK)
+        .json({ success: true, data: deletedMessages });
     }
   );
 }
