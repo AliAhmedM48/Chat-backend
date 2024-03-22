@@ -47,7 +47,7 @@ class ChatController {
             const { userId, chatId } = req.body;
             // const { id } = req.params;
             // const chat = await Chat.findByIdAndDelete(id);
-            const chat = yield chat_1.Chat.findByIdAndDelete(chatId, {
+            const chat = yield chat_1.Chat.findByIdAndUpdate(chatId, {
                 $pull: { users: userId },
             });
             console.log("User removed from chat successfully.");
