@@ -10,7 +10,8 @@ export default class UserController {
 
   getAllUsers = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const users = await this.service.getAllUsers();
+      const id = (req as any).loggedUser._id;
+      const users = await this.service.getAllUsers(id);
       res.status(HttpStatusCode.OK).json({ success: true, data: users });
     }
   );
@@ -19,7 +20,7 @@ export default class UserController {
     async (req: Request, res: Response, next: NextFunction): Promise<any> => {
       const { id } = req.params;
       const user = await this.service.getOneUser(id);
-      if (!user) return next(new NotFoundError("User not found"));
+      if (!user) return next(new NotFoundError("User not found..."));
       res.status(HttpStatusCode.OK).json({ success: true, data: user });
     }
   );

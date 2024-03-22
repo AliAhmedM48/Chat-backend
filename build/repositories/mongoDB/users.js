@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_1 = __importDefault(require("../../models/user"));
 class UserMongoRepository {
     constructor() {
-        this.findAll = () => __awaiter(this, void 0, void 0, function* () { return yield user_1.default.find(); });
+        this.findAll = (loggedUser) => __awaiter(this, void 0, void 0, function* () { return yield user_1.default.find({ _id: { $ne: loggedUser } }); });
         this.findOne = (id) => __awaiter(this, void 0, void 0, function* () { return yield user_1.default.findById(id); });
         this.update = (id, firstName, lastName, email, password, avatar, isOnline) => __awaiter(this, void 0, void 0, function* () {
             return yield user_1.default.findByIdAndUpdate(id, { firstName, lastName, email, avatar, password, isOnline }, { new: true });

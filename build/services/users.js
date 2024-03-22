@@ -16,7 +16,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 class UserService {
     constructor(repository) {
         this.repository = repository;
-        this.getAllUsers = () => __awaiter(this, void 0, void 0, function* () { return yield this.repository.findAll(); });
+        this.getAllUsers = (loggedUser) => __awaiter(this, void 0, void 0, function* () { return yield this.repository.findAll(loggedUser); });
         this.getOneUser = (id) => __awaiter(this, void 0, void 0, function* () { return yield this.repository.findOne(id); });
         this.updateUser = (id, firstName, lastName, email, password, avatar, isOnline) => __awaiter(this, void 0, void 0, function* () {
             if (password) {

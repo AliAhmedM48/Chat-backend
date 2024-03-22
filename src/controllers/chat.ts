@@ -59,7 +59,11 @@ export default class ChatController {
     async (req: Request, res: Response, next: NextFunction) => {
       const { chatId } = req.body;
       const id = (req as any).loggedUser._id; // logged user
-      await this.service.leaveChat(id, chatId);
+
+      const chat = await this.service.leaveChat(id, chatId);
+      if (!chat) {
+        return next(new NotFoundError("chat not found"));
+      }
       res.status(HttpStatusCode.NO_CONTENT).end();
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;

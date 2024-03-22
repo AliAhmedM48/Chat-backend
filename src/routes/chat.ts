@@ -7,7 +7,10 @@ import { Router } from "express";
 const chatRoutes = (controller: ChatController) => {
   const router = Router();
 
-  router.route("/").get(controller.getByUserIdOrByChatId);
+  router
+    .route("/")
+    .get(controller.getByUserIdOrByChatId)
+    .delete(controller.leaveChat);
 
   router
     .route("/createGroup")
@@ -17,9 +20,7 @@ const chatRoutes = (controller: ChatController) => {
     .route("/:id")
     .all(validateMongoID)
     .get(controller.getByUserIdOrByChatId)
-
-    .put(controller.updateChat)
-    .delete(controller.leaveChat);
+    .put(controller.updateChat);
 
   return router;
 };

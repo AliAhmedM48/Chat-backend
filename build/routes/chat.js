@@ -8,15 +8,18 @@ const chat_1 = __importDefault(require("../validations/chat"));
 const express_1 = require("express");
 const chatRoutes = (controller) => {
     const router = (0, express_1.Router)();
-    router.route("/")
-        .get(controller.getByUserIdOrByChatId);
-    router.route("/createGroup")
+    router
+        .route("/")
+        .get(controller.getByUserIdOrByChatId)
+        .delete(controller.leaveChat);
+    router
+        .route("/createGroup")
         .post(chat_1.default, controller.createGroup);
-    router.route("/:id")
+    router
+        .route("/:id")
         .all(validateMongoID_1.default)
         .get(controller.getByUserIdOrByChatId)
-        .put(controller.updateChat)
-        .delete(controller.leaveChat);
+        .put(controller.updateChat);
     return router;
 };
 exports.default = chatRoutes;

@@ -19,14 +19,15 @@ class UserController {
     constructor(service) {
         this.service = service;
         this.getAllUsers = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const users = yield this.service.getAllUsers();
+            const id = req.loggedUser._id;
+            const users = yield this.service.getAllUsers(id);
             res.status(httpStatusCode_1.default.OK).json({ success: true, data: users });
         }));
         this.getOneUser = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const user = yield this.service.getOneUser(id);
             if (!user)
-                return next(new notFoundError_1.default('User not found'));
+                return next(new notFoundError_1.default("User not found..."));
             res.status(httpStatusCode_1.default.OK).json({ success: true, data: user });
         }));
         this.updateUser = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
@@ -37,7 +38,7 @@ class UserController {
             const { firstName, lastName, email, password, avatar, isOnline } = req.body;
             const user = yield this.service.updateUser(id, firstName, lastName, email, password, avatar, isOnline);
             if (!user)
-                return next(new notFoundError_1.default('User not found'));
+                return next(new notFoundError_1.default("User not found"));
             res.status(httpStatusCode_1.default.OK).json({ success: true, data: user });
         }));
         this.deleteUser = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {

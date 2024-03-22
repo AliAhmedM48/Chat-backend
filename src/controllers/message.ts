@@ -21,6 +21,11 @@ export default class MessageController {
       if (!(receiverId || chatId)) {
         return next(new BadRequestError("send chatId or receiverId"));
       }
+      if (receiverId == id) {
+        return next(
+          new BadRequestError("receiverId must be different from loggedUser.id")
+        );
+      }
       // * CHECK Chat ID /////// check if chat id is provided
       if (!chatId) {
         // ! FIRST CASE /////// private chat /////// in case client start new chat from users list
@@ -55,7 +60,7 @@ export default class MessageController {
       const { chatId } = req.params;
       const id = (req as any).loggedUser._id; // logged user
       const checkChats = await this.chatService.findChatsByChatId(chatId);
-      if (!checkChats) {
+      if (checkChats.length === 0) {
         return next(new BadRequestError("chat id not found"));
       }
       const messages = await this.messageService.getChatMessages(chatId, id);
@@ -73,6 +78,10 @@ export default class MessageController {
         loggedUser_id,
         { body, image }
       );
+
+      if (!message) {
+        return next(new NotFoundError("message not found"));
+      }
       res.status(HttpStatusCode.OK).json({ success: true, data: message });
     }
   );
@@ -86,6 +95,10 @@ export default class MessageController {
         id,
         loggedUser_id
       );
+
+      if (deletedMessages.deletedCount === 0) {
+        return next(new NotFoundError("Messages not found"));
+      }
       res.status(HttpStatusCode.NO_CONTENT).end();
     }
   );
