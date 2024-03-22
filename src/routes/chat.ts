@@ -12,21 +12,19 @@ class ChatRoutes {
   }
 
   intializeRoutes() {
+    this.router.route("/").get(this.chatController.getByUserIdOrByChatId);
 
-    this.router.route("/")
-      .get(this.chatController.getByUserIdOrByChatId)
-
-
-    this.router.route("/createGroup")
+    this.router
+      .route("/createGroup")
       .post(createChatValidations, this.chatController.createGroup);
 
-    this.router.route("/:id")
+    this.router
+      .route("/:id")
       .all(validateMongoID)
       .get(this.chatController.getByUserIdOrByChatId)
 
       .put(this.chatController.updateChat)
       .delete(this.chatController.deleteChat);
-
   }
 }
 

@@ -7,7 +7,6 @@ import { NotFoundError } from "../errors/notFoundError";
 import { HttpStatusCode } from "../errors/httpStatusCode";
 
 export class UserController {
-
   getAllUsers = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const users = await User.find();
@@ -19,14 +18,15 @@ export class UserController {
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { id } = req.params;
       const user = await User.findById(id);
-      if (!user) { return next(new NotFoundError("User not found")); }
+      if (!user) {
+        return next(new NotFoundError("User not found"));
+      }
       res.status(HttpStatusCode.OK).json({ success: true, data: user });
     }
   );
 
   updateUser = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-
       if (Object.keys(req.body).length === 0) {
         res.status(HttpStatusCode.NOT_MODIFIED).end();
         return;
@@ -41,7 +41,13 @@ export class UserController {
       // * Update logged user data
       const user = await User.findByIdAndUpdate(
         id,
-        { firstName, lastName, email, avatar, passwordHash: hashedPassword || password },
+        {
+          firstName,
+          lastName,
+          email,
+          avatar,
+          passwordHash: hashedPassword || password,
+        },
         { new: true }
       );
 
