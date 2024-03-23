@@ -13,6 +13,6 @@ const swaggerOptions = {
         },
         servers: [{ url: 'https://chat-backend-citu.onrender.com/api/v1' }],
     },
-    apis: ['./src/routes/*.ts'],
+    apis: ['./routes/*.js'],
 };
 exports.default = swaggerOptions;
