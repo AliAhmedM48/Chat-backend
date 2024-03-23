@@ -6,6 +6,7 @@ interface IChat {
   users: Array<Types.ObjectId>;
   lastMessage: string;
   isGroup: boolean;
+  isEmpty: boolean;
 }
 const atLeastOneUserValidator = (value: Types.ObjectId[]) => {
   return value.length > 0;
@@ -18,6 +19,7 @@ const chatSchema = new Schema<IChat>(
     users: [{ type: Schema.Types.ObjectId, ref: "User" }],
     lastMessage: { type: String, default: "" },
     isGroup: { type: Boolean, default: false },
+    isEmpty: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

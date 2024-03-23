@@ -1,6 +1,6 @@
 import ChatController from "../controllers/chat";
 import validateMongoID from "../middlewares/validateMongoID";
-import createChatValidations from "../validations/chat";
+import { createGroupValid, createPrivateValid } from "../validations/chat";
 
 import { Router } from "express";
 
@@ -12,9 +12,10 @@ const chatRoutes = (controller: ChatController) => {
     .get(controller.getByUserIdOrByChatId)
     .delete(controller.leaveChat);
 
+  router.route("/createGroup").post(createGroupValid, controller.createGroup);
   router
-    .route("/createGroup")
-    .post(createChatValidations, controller.createGroup);
+    .route("/createChatPrivate")
+    .post(createPrivateValid, controller.createChatPrivate);
 
   router
     .route("/:id")

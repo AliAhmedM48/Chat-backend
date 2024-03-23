@@ -35,19 +35,11 @@ export default class MessageController {
           id,
           receiverId
         );
-        // let chat;
-        // if (existingChat) {
-        //   chatId = existingChat._id;
-        // } else {
-        //   chat = await this.chatService.createPrivateChat(id, receiverId);
-        //   chatId = chat._id;
-        // }
         chatId = existingChat
           ? existingChat._id
           : (await this.chatService.createPrivateChat(id, receiverId))._id;
         //#endregion
       }
-      const chat = await this.chatService.findChatsByChatId(chatId);
       const message = await this.messageService.createMessage(
         id,
         body,
@@ -60,6 +52,10 @@ export default class MessageController {
         message.body
       );
 
+      const updateChat = await this.chatService.updateChat(chatId, {
+        isEmpty: false,
+      });
+
       await pusher.trigger(chatId, "messages:new", message);
 
       const lastMessagee = lastMessage?.lastMessage;
@@ -70,12 +66,6 @@ export default class MessageController {
           id: chatId,
           lastMessagee,
         });
-      });
-
-      chat[0].users.forEach((user) => {
-        if (user._id) {
-          pusher.trigger(user._id.toString(), "conversation:new", chat);
-        }
       });
 
       res

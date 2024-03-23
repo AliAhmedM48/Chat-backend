@@ -14,6 +14,10 @@ export default class ChatMongoRepository {
     return await Chat.find({ _id: chatId }).populate("users");
   };
 
+  findOne = async (chatId: string) => {
+    return await Chat.findOne({ _id: chatId }).populate("users");
+  };
+
   findByUserId = async (userId: string) => {
     return await Chat.find({ users: userId }).populate("users");
   };
@@ -46,6 +50,7 @@ export default class ChatMongoRepository {
       name?: string;
       isGroup?: boolean;
       lastMessage?: string;
+      isEmpty?: boolean;
     }
   ) => {
     return await Chat.findByIdAndUpdate(chatId, update, { new: true }).populate(
@@ -54,8 +59,6 @@ export default class ChatMongoRepository {
   };
 
   deleteUser = async (loggedUser_id: string, chatId: string) => {
-    return await Chat.findByIdAndUpdate(chatId, {
-      $pull: { users: loggedUser_id },
-    });
+    return await Chat.findByIdAndDelete(chatId);
   };
 }

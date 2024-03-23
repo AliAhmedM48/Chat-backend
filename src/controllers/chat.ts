@@ -25,6 +25,29 @@ export default class ChatController {
 
       chat.users.forEach((user) => {
         if (user._id) {
+          console.log(user._id);
+
+          pusher.trigger(user._id.toString(), "conversation:new", chat);
+        }
+      });
+      res.status(HttpStatusCode.CREATED).json({ message: "create OK", chat });
+    }
+  ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+
+  createChatPrivate = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      let { receiverId } = req.body;
+
+      let loggedUserId = (req as any).loggedUser._id;
+      const chat = await this.service.createPrivateChat(
+        loggedUserId,
+        receiverId
+      );
+
+      chat.users.forEach((user) => {
+        if (user._id) {
+          console.log(user._id);
+
           pusher.trigger(user._id.toString(), "conversation:new", chat);
         }
       });
@@ -45,6 +68,9 @@ export default class ChatController {
       if (chats.length === 0) {
         chats = await this.service.findChatsByUserId(id);
       }
+
+      chats = chats.filter((chat) => !chat.isEmpty);
+      chats.forEach((chat) => console.log(chat.isEmpty));
 
       res.status(HttpStatusCode.OK).json(chats);
     }
