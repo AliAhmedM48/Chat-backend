@@ -3,92 +3,161 @@ import validateMongoID from "../middlewares/validateMongoID";
 
 import { Router } from "express";
 
-/**
- * Defines routes related to user management.
- * @param {UserController} controller - The user controller handling user-related operations.
- * @returns {Router} - Express router instance with user routes configured.
- */
 const userRoutes = (controller: UserController) => {
   const router = Router();
-
-  /**
- * @swagger
- * /users:
- *   get:
- *     summary: Get all users
- *     description: Retrieve a list of all users.
- *     responses:
- *       200:
- *         description: A list of users.
- *       500:
- *         description: Internal Server Error.
- */
 
   router.route("/")
 
     /**
-      * Get all users.
-      * @route GET /api/v1/users
-      * @group Users - Operations about users
-      * @returns {object} 200 - An array of user objects
-      * @returns {object} 500 - Internal server error
-      */
-    .get(controller.getAllUsers) // Endpoint to get all users
-
-    /**
-   * Delete a user.
-   * @route DELETE /api/v1/users
-   * @group Users - Operations about users
-   * @returns {object} 204 - No content
-   * @returns {object} 500 - Internal server error
-   */
-
-    .delete(controller.deleteUser) // Endpoint to delete a user
-
-
-    /**
-     * Update a user.
-     * @route PUT /api/v1/users
-     * @group Users - Operations about users
-     * @returns {object} 200 - User updated successfully
-     * @returns {object} 400 - Bad request
-     * @returns {object} 500 - Internal server error
+     * @swagger
+     * /users:
+     *   get:
+     *     summary: Get all users
+     *     description: Retrieve a list of all users.
+     *     tags: [User Section]
+     * 
+     *     security:
+     *       - bearerAuth: []
+     *     responses:
+     *       200:
+     *         description: A list of users.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 data:
+     *                   type: array
+     *                   items:
+     *                     $ref: '#/components/schemas/User'
+     *       401:
+     *         description: Unauthorized - Token is missing or invalid.
+     *       500:
+     *         description: Internal Server Error.
      */
 
-    .put(controller.updateUser); // Endpoint to update a user
-  /**
-    * @swagger
-    * /api/v1/users/{id}:
-    *   get:
-    *     summary: Get a user by ID
-    *     description: Retrieve a user by their ID.
-    *     parameters:
-    *       - in: path
-    *         name: id
-    *         description: ID of the user to retrieve
-    *         required: true
-    *         schema:
-    *           type: string
-    *           format: mongo-id
-    *     responses:
-    *       200:
-    *         description: User found
-    *       404:
-    *         description: User not found
-    *       500:
-    *         description: Internal Server Error.
-    */
-  router.route("/:id")
+
     /**
-      * Get a user by ID.
-      * @route GET /api/v1/users/{id}
-      * @group Users - Operations about users
-      * @param {string} id.path.required - User ID
-      * @returns {object} 200 - User object
-      * @returns {object} 404 - User not found
-      * @returns {object} 500 - Internal server error
-      */
-    .get(validateMongoID, controller.getOneUser); // Endpoint to get a user by ID
+  * @swagger
+  * /users/{id}:
+  *   get:
+  *     summary: Get user by ID
+  *     description: Retrieve a user by their ID.
+  *     tags: [User Section]  # Assuming you have a Users Section defined in your Swagger document
+  *     security:
+  *       - bearerAuth: []
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         schema:
+  *           type: string
+  *         description: The ID of the user to retrieve.
+  *     responses:
+  *       200:
+  *         description: User found.
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 success:
+  *                   type: boolean
+  *                   description: Indicates if the request was successful.
+  *                 data:
+  *                   $ref: '#/components/schemas/User'
+  *       404:
+  *         description: User not found.
+  *       500:
+  *         description: Internal Server Error.
+  */
+
+
+    .get(controller.getAllUsers)
+
+    /**
+     * @swagger
+     * /users:
+     *   delete:
+     *     summary: Delete a user
+     *     description: Delete the logged-in user.
+     *     tags: [User Section]  # Assuming you have a Users Section defined in your Swagger document
+     *     security:
+     *       - bearerAuth: []   # This endpoint requires a bearer token
+     *     responses:
+     *       204:
+     *         description: User successfully deleted.
+     *       401:
+     *         description: Unauthorized - Token is missing or invalid.
+     *       500:
+     *         description: Internal Server Error.
+     */
+
+    .delete(controller.deleteUser)
+
+    /**
+     * @swagger
+     * /users:
+     *   put:
+     *     summary: Update user information
+     *     description: Update information of the logged-in user.
+     *     tags: [User Section]  # Assuming you have a Users Section defined in your Swagger document
+     *     security:
+     *       - bearerAuth: []   # This endpoint requires a bearer token
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               firstName:
+     *                 type: string
+     *               lastName:
+     *                 type: string
+     *               email:
+     *                 type: string
+     *               password:
+     *                 type: string
+     *               avatar:
+     *                 type: string
+     *               isOnline:
+     *                 type: boolean
+     *     responses:
+     *       200:
+     *         description: User information successfully updated.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   description: Indicates if the request was successful.
+     *                 data:
+     *                   type: object
+     *                   description: Updated user data.
+     *       304:
+     *         description: Not modified. The request body is empty.
+     *       401:
+     *         description: Unauthorized - Token is missing or invalid.
+     *       404:
+     *         description: User not found.
+     *       500:
+     *         description: Internal Server Error.
+     */
+
+
+
+    .put(controller.updateUser);
+
+
+  router.route("/:id")
+
+    .get(validateMongoID, controller.getOneUser);
 
   return router;
 }

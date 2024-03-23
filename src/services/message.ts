@@ -6,6 +6,7 @@ import NotFoundError from "../errors/notFoundError";
 import { Request, Response, NextFunction } from "express";
 import MessageMongoRepository from "../repositories/mongoDB/message";
 
+
 export default class MessageService {
 
   constructor(private repository: MessageMongoRepository) { }

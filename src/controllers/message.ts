@@ -13,7 +13,7 @@ export default class MessageController {
   constructor(
     private messageService: MessageService,
     private chatService: ChatService
-  ) {}
+  ) { }
 
   createMessage = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
