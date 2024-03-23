@@ -37,6 +37,9 @@ class ChatService {
         this.findChatsByChatId = (chatId) => __awaiter(this, void 0, void 0, function* () {
             return this.repository.findByChatId(chatId);
         });
+        this.findChat = (chatId) => __awaiter(this, void 0, void 0, function* () {
+            return this.repository.findOne(chatId);
+        });
         this.findChatsByUserId = (userId) => __awaiter(this, void 0, void 0, function* () {
             return this.repository.findByUserId(userId);
         });

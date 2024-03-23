@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const httpStatusCode_1 = __importDefault(require("../errors/httpStatusCode"));
 const notFoundError_1 = __importDefault(require("../errors/notFoundError"));
+const app_1 = require("../app");
 // interface IChatController {
 //   createGroup(req: Request, res: Response, next: NextFunction): Promise<void>;
 //   getByUserIdOrByChatId(req: Request, res: Response, next: NextFunction): Promise<void>;
@@ -28,6 +29,24 @@ class ChatController {
             let { name, lastMessage } = req.body;
             let users = req.users; // from creation validation middleware
             const chat = yield this.service.createGroup(users, name, lastMessage);
+            chat.users.forEach((user) => {
+                if (user._id) {
+                    console.log(user._id);
+                    app_1.pusher.trigger(user._id.toString(), "conversation:new", chat);
+                }
+            });
+            res.status(httpStatusCode_1.default.CREATED).json({ message: "create OK", chat });
+        }));
+        this.createChatPrivate = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            let { receiverId } = req.body;
+            let loggedUserId = req.loggedUser._id;
+            const chat = yield this.service.createPrivateChat(loggedUserId, receiverId);
+            chat.users.forEach((user) => {
+                if (user._id) {
+                    console.log(user._id);
+                    app_1.pusher.trigger(user._id.toString(), "conversation:new", chat);
+                }
+            });
             res.status(httpStatusCode_1.default.CREATED).json({ message: "create OK", chat });
         }));
         this.getByUserIdOrByChatId = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
@@ -40,6 +59,8 @@ class ChatController {
             if (chats.length === 0) {
                 chats = yield this.service.findChatsByUserId(id);
             }
+            chats = chats.filter((chat) => !chat.isEmpty);
+            chats.forEach((chat) => console.log(chat.isEmpty));
             res.status(httpStatusCode_1.default.OK).json(chats);
         }));
         this.updateChat = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {

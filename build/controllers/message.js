@@ -16,12 +16,12 @@ const express_async_handler_1 = __importDefault(require("express-async-handler")
 const badRequestError_1 = __importDefault(require("../errors/badRequestError"));
 const httpStatusCode_1 = __importDefault(require("../errors/httpStatusCode"));
 const notFoundError_1 = __importDefault(require("../errors/notFoundError"));
+const app_1 = require("../app");
 class MessageController {
     constructor(messageService, chatService) {
         this.messageService = messageService;
         this.chatService = chatService;
         this.createMessage = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            var _a;
             let { receiverId, body, chatId, image } = req.body;
             const id = req.loggedUser._id; // logged user
             if (!(receiverId || chatId)) {
@@ -41,10 +41,22 @@ class MessageController {
                 //#endregion
             }
             const message = yield this.messageService.createMessage(id, body, id, image, chatId);
-            const lastMessage = (_a = (yield this.chatService.updateLastMessage(chatId, message.body))) === null || _a === void 0 ? void 0 : _a.lastMessage;
+            const lastMessage = yield this.chatService.updateLastMessage(chatId, message.body);
+            const updateChat = yield this.chatService.updateChat(chatId, {
+                isEmpty: false,
+            });
+            yield app_1.pusher.trigger(chatId, "messages:new", message);
+            const lastMessagee = lastMessage === null || lastMessage === void 0 ? void 0 : lastMessage.lastMessage;
+            const users = lastMessage === null || lastMessage === void 0 ? void 0 : lastMessage.users;
+            users.map((user) => {
+                app_1.pusher.trigger(user._id.toString(), "conversation:update", {
+                    id: chatId,
+                    lastMessagee,
+                });
+            });
             res
                 .status(httpStatusCode_1.default.CREATED)
-                .json({ success: true, data: message, lastMessage });
+                .json({ success: true, data: message, lastMessagee });
         }));
         this.getAllMessages = (0, express_async_handler_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { chatId } = req.params;

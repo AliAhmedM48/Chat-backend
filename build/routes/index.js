@@ -45,3 +45,77 @@ apiV1.use("/auth", (0, auth_4.default)(authController));
 apiV1.use("/users", authenticateUser_1.default, (0, user_2.default)(userController));
 apiV1.use("/chats", authenticateUser_1.default, (0, chat_4.default)(chatController));
 apiV1.use("/messages", authenticateUser_1.default, (0, message_4.default)(messageController));
+/**
+ * @swagger
+ * tags:
+ *   - name: Auth Section
+ *     description: Operations related to register & login
+ *   - name: User Section
+ *     description: Operations related to users
+ *   - name: Chat Section
+ *     description: Operations related to chats
+ *   - name: Message Section
+ *     description: Operations related to messages
+ *
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         firstName:
+ *           type: string
+ *         lastName:
+ *           type: string
+ *         email:
+ *           type: string
+ *         password:
+ *           type: string
+ *         avatar:
+ *           type: string
+ *         isOnline:
+ *           type: boolean
+ *
+ *     Chat:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         users:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/User'
+ *         lastMessage:
+ *           type: string
+ *         isGroup:
+ *           type: boolean
+ *         isEmpty:
+ *           type: boolean
+ *
+ *     Message:
+ *       type: object
+ *       properties:
+ *         senderId:
+ *           type: string
+ *           description: The ID of the user who sent the message.
+ *           $ref: '#/components/schemas/User'
+ *         chatId:
+ *           type: string
+ *           description: The ID of the chat associated with the message.
+ *           $ref: '#/components/schemas/Chat'
+ *         body:
+ *           type: string
+ *           description: The content of the message.
+ *         seenIds:
+ *           type: array
+ *           description: IDs of users who have seen the message.
+ *           items:
+ *             type: string
+ *             $ref: '#/components/schemas/User'
+ *         image:
+ *           type: string
+ *           description: The image attached to the message.
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ */

@@ -21,13 +21,16 @@ class ChatMongoRepository {
         this.findByChatId = (chatId) => __awaiter(this, void 0, void 0, function* () {
             return yield chat_1.default.find({ _id: chatId }).populate("users");
         });
+        this.findOne = (chatId) => __awaiter(this, void 0, void 0, function* () {
+            return yield chat_1.default.findOne({ _id: chatId }).populate("users");
+        });
         this.findByUserId = (userId) => __awaiter(this, void 0, void 0, function* () {
             return yield chat_1.default.find({ users: userId }).populate("users");
         });
         this.findDirectChatBetweenUsers = (loggedUser_id, receiverId) => __awaiter(this, void 0, void 0, function* () {
             return yield chat_1.default.findOne({
                 isGroup: false,
-                users: { $all: [loggedUser_id, receiverId] }
+                users: { $all: [loggedUser_id, receiverId] },
             });
         });
         this.findChatByIdAndUser = (chatId, loggedUser_id) => __awaiter(this, void 0, void 0, function* () {
@@ -40,12 +43,10 @@ class ChatMongoRepository {
             return yield chat_1.default.find({ users: id }).populate("users");
         });
         this.update = (chatId, update) => __awaiter(this, void 0, void 0, function* () {
-            return yield chat_1.default.findByIdAndUpdate(chatId, update, { new: true });
+            return yield chat_1.default.findByIdAndUpdate(chatId, update, { new: true }).populate("users");
         });
         this.deleteUser = (loggedUser_id, chatId) => __awaiter(this, void 0, void 0, function* () {
-            return yield chat_1.default.findByIdAndUpdate(chatId, {
-                $pull: { users: loggedUser_id },
-            });
+            return yield chat_1.default.findByIdAndDelete(chatId);
         });
     }
 }

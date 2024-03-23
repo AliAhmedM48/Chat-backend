@@ -10,6 +10,7 @@ const chatSchema = new mongoose_1.Schema({
     users: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
     lastMessage: { type: String, default: "" },
     isGroup: { type: Boolean, default: false },
+    isEmpty: { type: Boolean, default: true },
 }, { timestamps: true });
 // ^ Model
 const Chat = (0, mongoose_1.model)("Chat", chatSchema, "chats");
