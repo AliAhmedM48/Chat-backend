@@ -33,7 +33,13 @@ export const createPrivateValid = [
   check("receiverId")
     .isMongoId()
     .withMessage("Invalid ID formate")
-    .custom(async (receiverId) => {
+    .custom(async (receiverId, { req }) => {
+      const id = (req as any).loggedUser._id;
+      const users = [];
+      users.push(id);
+      users.push(receiverId);
+
+      req.users = users;
       const result = await User.findOne({ _id: receiverId });
       if (!result) {
         throw new Error(`Invalid receiver Id`);

@@ -37,12 +37,10 @@ export default class ChatController {
   createChatPrivate = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       let { receiverId } = req.body;
+      let users = (req as any).users;
 
       let loggedUserId = (req as any).loggedUser._id;
-      const chat = await this.service.createPrivateChat(
-        loggedUserId,
-        receiverId
-      );
+      const chat = await this.service.createPrivateChat(users);
 
       chat.users.forEach((user) => {
         if (user._id) {

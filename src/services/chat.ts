@@ -19,24 +19,11 @@ export default class ChatService {
   };
 
   createPrivateChat = async (
-    loggedUser_id?: string,
-    receiverId?: string,
+    users: string[],
     name?: string,
     lastMessage?: string
   ) => {
-    const existingChat = await this.repository.findDirectChatBetweenUsers(
-      loggedUser_id!,
-      receiverId!
-    );
-    if (!existingChat) {
-      return await this.repository.create(
-        [loggedUser_id!, receiverId!],
-        false,
-        name!,
-        lastMessage
-      );
-    }
-    return existingChat;
+    return await this.repository.create(users, false, name!, lastMessage);
   };
 
   getPreviousChat = async (loggedUser_id: string, receiverId: string) => {
