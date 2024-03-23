@@ -11,7 +11,7 @@ const swaggerOptions = {
                 name: 'Your Name',
             },
         },
-        servers: [{ url: 'http://localhost:3000/api/v1' }],
+        servers: [{ url: 'https://chat-backend-citu.onrender.com/api/v1' }],
     },
     apis: ['./src/routes/*.ts'],
 };
