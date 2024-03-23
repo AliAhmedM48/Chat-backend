@@ -4,6 +4,7 @@ import asyncHandler from "express-async-handler";
 import HttpStatusCode from "../errors/httpStatusCode";
 import NotFoundError from "../errors/notFoundError";
 import ChatService from "../services/chat";
+import { pusher } from "../app";
 
 // interface IChatController {
 //   createGroup(req: Request, res: Response, next: NextFunction): Promise<void>;
@@ -21,6 +22,35 @@ export default class ChatController {
       let users = (req as any).users; // from creation validation middleware
 
       const chat = await this.service.createGroup(users, name, lastMessage);
+
+      chat.users.forEach((user) => {
+        if (user._id) {
+          console.log(user._id);
+
+          pusher.trigger(user._id.toString(), "conversation:new", chat);
+        }
+      });
+      res.status(HttpStatusCode.CREATED).json({ message: "create OK", chat });
+    }
+  ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+
+  createChatPrivate = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      let { receiverId } = req.body;
+
+      let loggedUserId = (req as any).loggedUser._id;
+      const chat = await this.service.createPrivateChat(
+        loggedUserId,
+        receiverId
+      );
+
+      chat.users.forEach((user) => {
+        if (user._id) {
+          console.log(user._id);
+
+          pusher.trigger(user._id.toString(), "conversation:new", chat);
+        }
+      });
       res.status(HttpStatusCode.CREATED).json({ message: "create OK", chat });
     }
   ) as (req: Request, res: Response, next: NextFunction) => Promise<void>;
@@ -38,6 +68,9 @@ export default class ChatController {
       if (chats.length === 0) {
         chats = await this.service.findChatsByUserId(id);
       }
+
+      chats = chats.filter((chat) => !chat.isEmpty);
+      chats.forEach((chat) => console.log(chat.isEmpty));
 
       res.status(HttpStatusCode.OK).json(chats);
     }
