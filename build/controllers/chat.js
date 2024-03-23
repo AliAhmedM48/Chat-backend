@@ -59,7 +59,7 @@ class ChatController {
             if (chats.length === 0) {
                 chats = yield this.service.findChatsByUserId(id);
             }
-            
+            chats = chats.filter((chat) => !chat.isEmpty);
             chats.forEach((chat) => console.log(chat.isEmpty));
             res.status(httpStatusCode_1.default.OK).json(chats);
         }));
